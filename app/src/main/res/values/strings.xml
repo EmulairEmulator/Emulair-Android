@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- Default -->
+    <string name="app_name">Emulair</string>
+    <string name="error_title">Error</string>
+    <string name="warning_title">Warning!</string>
+    <string name="question_title">Are you sure?</string>
+    <string name="action_positive_title">OK</string>
+    <string name="action_negative_title">Cancel</string>
+
+    <!-- Top Navigation -->
+    <string name="nav_games_title">Games</string>
+    <string name="nav_systems_title">Systems</string>
+    <string name="nav_online_title">Online</string>
+    <string name="nav_settings_title">Settings</string>
+
+</resources>
