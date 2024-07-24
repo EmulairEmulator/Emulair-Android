@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.bigbratan.emulair.models.Game
+import com.bigbratan.emulair.ui.components.immersive.ImmersiveRow
 import com.bigbratan.emulair.ui.theme.noFontPadding
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 import kotlinx.coroutines.launch

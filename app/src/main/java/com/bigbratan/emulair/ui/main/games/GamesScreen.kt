@@ -36,9 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bigbratan.emulair.models.Game
 import com.bigbratan.emulair.ui.components.ImmersiveGameCarousel
-import com.bigbratan.emulair.ui.components.ImmersiveRow
-import com.bigbratan.emulair.ui.components.drag
-import com.bigbratan.emulair.ui.components.rememberImmersiveListState
 import com.bigbratan.emulair.ui.theme.noFontPadding
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 
