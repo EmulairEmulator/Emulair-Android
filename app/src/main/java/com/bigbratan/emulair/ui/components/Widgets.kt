@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -58,13 +59,16 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -224,11 +228,58 @@ fun ImmersiveGameCarouselItem(
     title: String,
     onGameClick: () -> Unit,
 ) {
+    // var isDragging by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onGameClick)
+            /*.pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        try {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    if (event.changes.any { it.positionChange() != Offset.Zero }) {
+                                        isDragging = true
+                                    }
+                                    if (event.changes.all { it.changedToUp() }) break
+                                }
+                            }
+                        } finally {
+                            if (!isDragging) {
+                                onGameClick()
+                            }
+                        }
+                    }
+                )
+            }*/
+            /*.pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        awaitPointerEventScope {
+                            awaitFirstDown().also { isDragging = false }
+
+                            try {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+
+                                    if (event.changes.any { it.positionChange() != Offset.Zero }) {
+                                        isDragging = true
+                                    }
+                                    if (event.changes.all { it.changedToUp() }) break
+                                }
+                            } finally {
+                                if (!isDragging) {
+                                    onGameClick()
+                                }
+                            }
+                        }
+                    }
+                )
+            }*/
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .aspectRatio(1f)
             .focusable(),
@@ -277,20 +328,21 @@ fun ImmersiveGameCarousel(
     visibleItems: Int,
     selectedItemOffset: Dp,
     itemSpacing: Dp,
-    onGameClick: () -> Unit,
+    onGameClick: (Int) -> Unit,
 ) {
     ImmersiveRow(
         modifier = modifier,
         visibleItems = visibleItems,
         selectedItemOffset = selectedItemOffset,
         itemSpacing = itemSpacing,
+        // onItemClick = onGameClick,
     ) {
         for (index in games.indices) {
             ImmersiveGameCarouselItem(
                 icon = games[index].icon,
                 iconUri = games[index].iconUri,
                 title = games[index].title,
-                onGameClick = { onGameClick() },
+                onGameClick = { onGameClick(index) },
             )
         }
     }

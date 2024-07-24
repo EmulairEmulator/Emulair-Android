@@ -12,6 +12,7 @@ fun ImmersiveRow(
     visibleItems: Int,
     selectedItemOffset: Dp,
     itemSpacing: Dp,
+    // onItemClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     ImmersiveList(
@@ -21,6 +22,7 @@ fun ImmersiveRow(
         visibleItems = visibleItems,
         selectedItemOffset = selectedItemOffset,
         itemSpacing = itemSpacing,
+        // onItemClick = onItemClick,
         content = content,
     )
 }

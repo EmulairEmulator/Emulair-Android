@@ -4,6 +4,7 @@ import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -30,6 +32,7 @@ fun ImmersiveList(
     overshootItems: Int = 0, // TODO: remove it, or make it a float/double if you keep it
     selectedItemOffset: Dp = 0.dp,
     itemSpacing: Dp = 0.dp,
+    // onItemClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     val localDensity = LocalDensity.current
@@ -42,6 +45,7 @@ fun ImmersiveList(
     Layout(
         modifier = modifier
             .clipToBounds()
+            // .dragAndClick(state, orientation, onItemClick),
             .drag(state, orientation),
         content = content,
     ) { measurables, constraints ->
@@ -96,7 +100,7 @@ private fun Modifier.drag(
 
                         launch { state.snapTo(verticalDragOffset) }
                         tracker.addPosition(change.uptimeMillis, change.position)
-                        if (change.positionChange() != Offset.Zero) change.consume()
+                        if (change.positionChange() != Offset.Zero) { change.consume() }
                     }
 
                     velocity = tracker.calculateVelocity().y
@@ -107,7 +111,7 @@ private fun Modifier.drag(
 
                         launch { state.snapTo(horizontalDragOffset) }
                         tracker.addPosition(change.uptimeMillis, change.position)
-                        if (change.positionChange() != Offset.Zero) change.consume()
+                        if (change.positionChange() != Offset.Zero) { change.consume() }
                     }
 
                     velocity = tracker.calculateVelocity().x
@@ -119,3 +123,87 @@ private fun Modifier.drag(
         }
     }
 }
+
+private fun Modifier.dragAndClick(
+    state: ImmersiveListState,
+    orientation: Orientation,
+    onItemClick: () -> Unit,
+) = pointerInput(Unit) {
+    val decay = splineBasedDecay<Float>(this)
+
+    coroutineScope {
+        while (true) {
+            var velocity = 0f
+            var targetValue = 0f
+            var isDragging = false
+
+            awaitPointerEventScope {
+                val pointerId = awaitFirstDown().id
+
+                launch { state.stop() }
+
+                val tracker = VelocityTracker()
+
+                if (orientation == Orientation.Vertical) {
+                    verticalDrag(pointerId) { change ->
+                        val verticalDragOffset = state.listOffset + change.positionChange().y
+
+                        launch { state.snapTo(verticalDragOffset) }
+                        tracker.addPosition(change.uptimeMillis, change.position)
+                        if (change.positionChange() != Offset.Zero) {
+                            isDragging = true
+                            change.consume()
+                        }
+                    }
+
+                    velocity = tracker.calculateVelocity().y
+                    targetValue = decay.calculateTargetValue(state.listOffset, velocity)
+                } else if (orientation == Orientation.Horizontal) {
+                    horizontalDrag(pointerId) { change ->
+                        val horizontalDragOffset = state.listOffset + change.positionChange().x
+
+                        launch { state.snapTo(horizontalDragOffset) }
+                        tracker.addPosition(change.uptimeMillis, change.position)
+                        if (change.positionChange() != Offset.Zero) {
+                            isDragging = true
+                            change.consume()
+                        }
+                    }
+
+                    velocity = tracker.calculateVelocity().x
+                    targetValue = decay.calculateTargetValue(state.listOffset, velocity)
+                }
+            }
+
+            if (!isDragging) { onItemClick() }
+
+            launch { state.decayTo(velocity, targetValue) }
+        }
+    }
+}
+
+/*
+private fun Modifier.itemClick(
+    state: ImmersiveListState,
+    itemWidth: Int,
+    onClick: (Int) -> Unit
+) = this.then(
+    Modifier.pointerInput(Unit) {
+        detectTapGestures(
+            onPress = { offset ->
+                val index = (offset.x / itemWidth).toInt()
+
+                if (index in state.firstVisibleItem..state.lastVisibleItem) {
+                    val success = tryAwaitRelease()
+
+                    if (success) {
+                        coroutineScope {
+                            launch { onClick(index) }
+                        }
+                    }
+                }
+                false
+            }
+        )
+    }
+)*/

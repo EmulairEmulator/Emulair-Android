@@ -1,5 +1,6 @@
 package com.bigbratan.emulair.ui.main.games
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -185,7 +186,9 @@ fun GamesScreen() {
             visibleItems = 6,
             selectedItemOffset = 32.dp,
             itemSpacing = 8.dp,
-            onGameClick = {}
+            onGameClick = { index ->
+                Log.d("GamesScreen", "Game clicked: $index")
+            }
         )
     }
 }
