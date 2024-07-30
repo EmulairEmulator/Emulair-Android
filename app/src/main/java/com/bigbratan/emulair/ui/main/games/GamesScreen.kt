@@ -6,17 +6,22 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bigbratan.emulair.models.Game
 import com.bigbratan.emulair.ui.components.ImmersiveGameCarousel
+import com.bigbratan.emulair.ui.components.ImmersiveGameCarouselItem
+import com.bigbratan.emulair.ui.components.immersive.ImmersiveRow
 import com.bigbratan.emulair.ui.theme.noFontPadding
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 
@@ -51,7 +58,7 @@ fun GamesScreen() {
             itemSpacing = 8.dp,
         )
 
-        ImmersiveGameCarousel(
+        /*ImmersiveGameCarousel(
             modifier = Modifier.padding(top = 24.dp),
             games = listOf(
                 Game(
@@ -189,7 +196,65 @@ fun GamesScreen() {
             onGameClick = { index ->
                 Log.d("GamesScreen", "Game clicked: $index")
             }
-        )
+        )*/
+
+        Column {
+            ImmersiveRow(
+                modifier = Modifier,
+                visibleItems = 6,
+                selectedItemOffset = 32.dp,
+                itemSpacing = 8.dp,
+            ) {
+                for (index in 0..10000) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .aspectRatio(1f)
+                            .focusable(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "Game $index",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = plusJakartaSans,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            style = TextStyle(platformStyle = noFontPadding),
+                        )
+                    }
+                }
+            }
+
+            /*LazyRow(
+                modifier = Modifier.padding(top = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(16.dp),
+            ) {
+                items(10000) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width(150.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .aspectRatio(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "Game $index",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = plusJakartaSans,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            style = TextStyle(platformStyle = noFontPadding),
+                        )
+                    }
+                }
+            }*/
+        }
     }
 }
 
