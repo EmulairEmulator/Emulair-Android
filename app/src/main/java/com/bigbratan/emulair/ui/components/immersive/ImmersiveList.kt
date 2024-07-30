@@ -126,7 +126,7 @@ private fun Modifier.drag(
     }
 }
 
-private fun Modifier.dragAndClick(
+/*private fun Modifier.dragAndClick(
     state: ImmersiveListState,
     orientation: Orientation,
     onItemClick: () -> Unit,
@@ -182,7 +182,7 @@ private fun Modifier.dragAndClick(
             launch { state.decayTo(velocity, targetValue) }
         }
     }
-}
+}*/
 
 /*
 private fun Modifier.itemClick(

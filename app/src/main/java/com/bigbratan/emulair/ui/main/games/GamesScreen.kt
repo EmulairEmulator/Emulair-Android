@@ -205,7 +205,7 @@ fun GamesScreen() {
                 selectedItemOffset = 32.dp,
                 itemSpacing = 8.dp,
             ) {
-                for (index in 0..10000) {
+                for (index in 0..100) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()

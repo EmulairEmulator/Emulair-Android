@@ -1,28 +1,28 @@
 [versions]
 # Android
 coreKtx = "1.13.1"
-activityCompose = "1.9.0"
+activityCompose = "1.9.1"
 datastorePreferences = "1.1.1"
 
 # Compose
 composeBom = "2024.06.00"
 
 # Dependency Injection
-dagger = "2.48.1"
+dagger = "2.51.1"
 hilt = "1.2.0"
 work = "2.9.0"
 
 # Lifecycle
-lifecycle = "2.8.3"
+lifecycle = "2.8.4"
 
 # Google + Kotlin
-kotlin = "1.9.0"
-kotlinReflect = "1.9.10"
-kotlinXCoroutines = "1.7.3"
+kotlin = "2.0.0"
+kotlinReflect = "1.9.22"
+kotlinXCoroutines = "1.8.0"
 gson = "2.10.1"
 
 # API
-coil = "2.5.0"
+coil = "2.6.0"
 apiclient = "1.0.0"
 chucker = "4.0.0"
 
@@ -31,11 +31,11 @@ room = "2.6.1"
 
 # Extras
 accompanistSystemUiController = "0.30.1"
-accompanistPermissions = "0.32.0"
+accompanistPermissions = "0.34.0"
 accompanistNavigationAnimation = "0.30.1"
 
 # Plugins
-agp = "8.3.2"
+agp = "8.5.1"
 library = "8.1.4"
 ksp = "2.0.0-1.0.23"
 
@@ -96,10 +96,12 @@ google-accompanist-permissions = { group = "com.google.accompanist", name = "acc
 google-accompanist-navigation-animation = { group = "com.google.accompanist", name = "accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
 
 [plugins]
-androidApplication = { id = "com.android.application", version.ref = "agp" }
-jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-androidLibrary = { id = "com.android.library", version.ref = "library" }
-googleDaggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
-googleDevtoolsKsp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "library" }
+google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
 
 
