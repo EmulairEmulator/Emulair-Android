@@ -1,62 +1,62 @@
 package com.bigbratan.emulair.ui.main.games
 
-import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerSnapDistance
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
-import com.bigbratan.emulair.models.Game
-import com.bigbratan.emulair.ui.components.ImmersiveGameCarousel
-import com.bigbratan.emulair.ui.components.ImmersiveGameCarouselItem
-import com.bigbratan.emulair.ui.components.immersive.ImmersiveRow
+import androidx.compose.ui.util.lerp
 import com.bigbratan.emulair.ui.theme.noFontPadding
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
+import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GamesScreen() {
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        SelectedItemIndicator(
+        /* SelectedItemIndicator(
             visibleItems = 6,
             selectedItemOffset = 32.dp,
             itemSpacing = 8.dp,
-        )
+        ) */
 
         /*ImmersiveGameCarousel(
             modifier = Modifier.padding(top = 24.dp),
@@ -198,62 +198,153 @@ fun GamesScreen() {
             }
         )*/
 
-        Column {
-            ImmersiveRow(
-                modifier = Modifier,
-                visibleItems = 6,
-                selectedItemOffset = 32.dp,
-                itemSpacing = 8.dp,
-            ) {
-                for (index in 0..100) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .aspectRatio(1f)
-                            .focusable(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "Game $index",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontFamily = plusJakartaSans,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            style = TextStyle(platformStyle = noFontPadding),
-                        )
-                    }
+        // Column {
+        /* ImmersiveRow(
+            modifier = Modifier,
+            visibleItems = 6,
+            selectedItemOffset = 32.dp,
+            itemSpacing = 8.dp,
+        ) {
+            for (index in 0..100) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .aspectRatio(1f)
+                        .focusable(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "Game $index",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontFamily = plusJakartaSans,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        style = TextStyle(platformStyle = noFontPadding),
+                    )
                 }
             }
+        } */
 
-            /*LazyRow(
-                modifier = Modifier.padding(top = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(16.dp),
-            ) {
-                items(10000) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .aspectRatio(1f),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "Game $index",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontFamily = plusJakartaSans,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            style = TextStyle(platformStyle = noFontPadding),
-                        )
-                    }
+        /*LazyRow(
+            modifier = Modifier.padding(top = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(16.dp),
+        ) {
+            items(10000) { index ->
+                Box(
+                    modifier = Modifier
+                        .width(150.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .aspectRatio(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "Game $index",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontFamily = plusJakartaSans,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        style = TextStyle(platformStyle = noFontPadding),
+                    )
                 }
-            }*/
+            }
+        }*/
+        // }
+
+        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+        val visibleItems = 6
+        val itemWidth = screenWidth / visibleItems
+        val itemCount = 10
+        val itemSpacing = 16.dp
+        val pagerState = rememberPagerState(pageCount = { itemCount })
+        val paddingStart = 32.dp
+        val paddingEnd = maxOf((screenWidth - itemWidth - paddingStart), 0.dp)
+
+        val scope = rememberCoroutineScope()
+        val focusManager = LocalFocusManager.current
+
+        HorizontalPager(
+            modifier = Modifier.padding(top = 24.dp),
+            state = pagerState,
+            flingBehavior = PagerDefaults.flingBehavior(
+                state = pagerState,
+                pagerSnapDistance = PagerSnapDistance.atMost(10)
+            ),
+            contentPadding = PaddingValues(start = paddingStart, end = paddingEnd),
+            // pageSpacing = itemSpacing,
+            beyondViewportPageCount = 6,
+        ) { page ->
+            val pageOffSet =
+                ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+            val scaleFactor = lerp(
+                start = 1f,
+                stop = 1.2f,
+                fraction = 1f - pageOffSet.coerceIn(0f, 1f),
+            )
+            /* val paddingFactor = lerp(
+                start = 1f,
+                stop = 2.4f,
+                fraction = 1f - pageOffSet.coerceIn(0f, 1f),
+            ) */
+            val alphaFactor = lerp(
+                start = 0.5f,
+                stop = 1f,
+                fraction = 1f - pageOffSet.coerceIn(0f, 1f),
+            )
+
+            Box(
+                modifier = Modifier
+                    .graphicsLayer {
+                        // scaleX = scaleFactor
+                        scaleY = scaleFactor
+                        alpha = alphaFactor
+                    }
+                    .padding(horizontal = itemSpacing / 2)
+                    // .padding(horizontal = itemSpacing / 2 * paddingFactor)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(),
+                        enabled = true,
+                    ) {
+                        scope.launch {
+                            pagerState.animateScrollToPage(page)
+                        }
+                    },
+                /* .onKeyEvent { event ->
+                    when (event.key) {
+                        Key.DirectionRight -> {
+                            focusManager.moveFocus(FocusDirection.Down)
+                            true
+                        }
+
+                        Key.DirectionLeft -> {
+                            focusManager.moveFocus(FocusDirection.Up)
+                            true
+                        }
+
+                        else -> false
+                    }
+                } */
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "Game $page",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontFamily = plusJakartaSans,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(platformStyle = noFontPadding),
+                )
+            }
         }
     }
 }

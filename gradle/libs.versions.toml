@@ -6,11 +6,12 @@ datastorePreferences = "1.1.1"
 
 # Compose
 composeBom = "2024.06.00"
+composeFoundation = "1.7.0-beta07"
 
 # Dependency Injection
 dagger = "2.51.1"
 hilt = "1.2.0"
-work = "2.9.0"
+work = "2.9.1"
 
 # Lifecycle
 lifecycle = "2.8.4"
@@ -30,12 +31,12 @@ chucker = "4.0.0"
 room = "2.6.1"
 
 # Extras
-accompanistSystemUiController = "0.30.1"
+accompanistSystemUiController = "0.32.0"
 accompanistPermissions = "0.34.0"
 accompanistNavigationAnimation = "0.30.1"
 
 # Plugins
-agp = "8.5.1"
+agp = "8.5.2"
 library = "8.1.4"
 ksp = "2.0.0-1.0.23"
 
@@ -47,15 +48,16 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 
 # Compose
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
-androidx-runtime = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "composeFoundation" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose" }
 
 # Dependency Injection
