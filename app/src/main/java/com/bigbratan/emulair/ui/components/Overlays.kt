@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bigbratan.emulair.R
-import com.bigbratan.emulair.ui.theme.noFontPadding
+import com.bigbratan.emulair.ui.theme.removeFontPadding
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 
 @Composable
@@ -98,7 +95,7 @@ internal fun ErrorMessage(
             fontWeight = FontWeight.Medium,
             fontSize = 24.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            style = TextStyle(platformStyle = noFontPadding),
+            style = TextStyle(platformStyle = removeFontPadding),
         )
 
         if (action != null && onClick != null) {

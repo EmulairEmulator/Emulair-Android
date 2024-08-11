@@ -1,6 +1,5 @@
 package com.bigbratan.emulair.ui.theme
 
-import androidx.compose.material3.Typography
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.googlefonts.GoogleFont
@@ -20,7 +19,7 @@ val plusJakartaSans = FontFamily(
     )
 )
 
-val noFontPadding = PlatformTextStyle(
+val removeFontPadding = PlatformTextStyle(
     includeFontPadding = false,
 )
 
