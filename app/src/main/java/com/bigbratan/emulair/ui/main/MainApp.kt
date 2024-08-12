@@ -13,7 +13,9 @@ fun NavGraphBuilder.mainApp(
     navController: NavHostController,
 ) {
     composable(route = Destination.Main.GamesDestination.route) {
-        GamesScreen()
+        GamesScreen(
+            onGameClick = {}
+        )
     }
 
     composable(route = Destination.Main.SystemsDestination.route) {

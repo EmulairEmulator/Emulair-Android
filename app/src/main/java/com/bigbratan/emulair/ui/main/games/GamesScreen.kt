@@ -1,38 +1,25 @@
 package com.bigbratan.emulair.ui.main.games
 
-import android.util.Log
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -40,61 +27,85 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
-import com.bigbratan.emulair.ui.theme.removeFontPadding
-import com.bigbratan.emulair.ui.theme.plusJakartaSans
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.bigbratan.emulair.models.Game
+import com.bigbratan.emulair.ui.components.GamesListItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun GamesScreen() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-        val visibleItems = 6
-        val itemCount = 10
-        val itemSpacing = 16.dp
-        val itemWidth = (screenWidth - itemSpacing * (visibleItems - 1)) / visibleItems
-        val contentPaddingStart = 32.dp
-        val contentPaddingEnd = screenWidth - itemWidth - contentPaddingStart
+fun GamesScreen(
+    viewModel: GamesViewModel = hiltViewModel(),
+    onGameClick: (Game) -> Unit,
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val visibleItems = 6
+    val itemCount = previewGames.size
+    val itemSpacing = 16.dp
+    val itemWidth = (screenWidth - itemSpacing * (visibleItems - 1)) / visibleItems
+    val contentPaddingStart = 32.dp
+    val contentPaddingEnd = screenWidth - itemWidth - contentPaddingStart
 
-        val pagerState = rememberPagerState(pageCount = { itemCount })
-        val coroutineScope = rememberCoroutineScope()
-        val focusRequesters = remember { List(itemCount) { FocusRequester() } }
-        val currentFocusedItem = remember { mutableIntStateOf(0) }
+    val pagerState = rememberPagerState(pageCount = { itemCount })
+    val coroutineScope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+    val currentFocusedItem = remember { mutableIntStateOf(0) }
+    val isLongPressing = remember { mutableStateOf(false) }
+    val timeUntilScrollStarts = 400L
 
-        LaunchedEffect(pagerState.currentPage) {
-            currentFocusedItem.intValue = pagerState.currentPage
-            focusRequesters[pagerState.currentPage].requestFocus()
-        }
+    val games = previewGames
 
-        HorizontalPager(
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .onKeyEvent { event ->
-                    when (event.key) {
-                        Key.DirectionRight, Key.DirectionLeft -> {
-                            val direction = if (event.key == Key.DirectionRight) 1 else -1
-                            val newPage = (pagerState.currentPage + direction)
-                                .coerceIn(0, itemCount - 1)
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(newPage)
+    LaunchedEffect(pagerState.currentPage) {
+        currentFocusedItem.intValue = pagerState.currentPage
+    }
+
+    Box(
+        modifier = Modifier
+            .padding(top = 24.dp)
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { event ->
+                when {
+                    (event.key == Key.DirectionRight || event.key == Key.DirectionLeft) && event.type == KeyEventType.KeyDown -> {
+                        val direction = if (event.key == Key.DirectionRight) 1 else -1
+                        isLongPressing.value = true
+
+                        coroutineScope.launch {
+                            while (isLongPressing.value) {
+                                val newPage = (pagerState.currentPage + direction)
+                                    .coerceIn(0, itemCount - 1)
+
+                                pagerState.animateScrollToPage(
+                                    page = newPage,
+                                    animationSpec = spring(stiffness = Spring.StiffnessHigh),
+                                )
+                                currentFocusedItem.intValue = newPage
+                                focusRequester.requestFocus()
+                                delay(timeUntilScrollStarts)
                             }
-                            currentFocusedItem.intValue = newPage
-                            focusRequesters[newPage].requestFocus()
-                            true
                         }
-
-                        else -> false
+                        true
                     }
-                },
+
+                    (event.key == Key.DirectionRight || event.key == Key.DirectionLeft) && event.type == KeyEventType.KeyUp -> {
+                        isLongPressing.value = false
+                        true
+                    }
+
+                    else -> false
+                }
+            },
+    ) {
+        HorizontalPager(
+            modifier = Modifier,
             state = pagerState,
             flingBehavior = PagerDefaults.flingBehavior(
                 state = pagerState,
@@ -109,69 +120,162 @@ fun GamesScreen() {
         ) { page ->
             val pageOffSet =
                 ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
-            val alphaFactor = lerp(
-                start = 0.5f,
-                stop = 1f,
-                fraction = 1f - pageOffSet.coerceIn(0f, 1f),
-            )
-            val scaleFactor = lerp(
-                start = 1f,
-                stop = 1.2f,
-                fraction = 1f - pageOffSet.coerceIn(0f, 1f),
-            )
 
-            Box(
-                modifier = Modifier
-                    .graphicsLayer { alpha = alphaFactor }
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .focusRequester(focusRequesters[page])
-                    .onFocusChanged { focusState ->
-                        if (focusState.isFocused) {
-                            currentFocusedItem.intValue = page
-                        }
-                    }
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(),
-                        enabled = true,
-                    ) {
+            GamesListItem(
+                modifier = Modifier.graphicsLayer {
+                    alpha = lerp(
+                        start = 0.4f,
+                        stop = 1f,
+                        fraction = 1f - pageOffSet.coerceIn(0f, 1f),
+                    )
+                },
+                icon = games[page].icon,
+                iconUri = games[page].iconUri,
+                title = games[page].title,
+                itemWidth = itemWidth,
+                onGameClick = {
+                    currentFocusedItem.intValue = page
+
+                    if (pagerState.currentPage == page) {
+                        onGameClick(games[page])
+                    } else {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(page)
                         }
-                    },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = "Game $page",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontFamily = plusJakartaSans,
-                    fontSize = (itemWidth / 6).value.sp,
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(platformStyle = removeFontPadding),
-                )
-            }
+                    }
+                },
+            )
         }
     }
 }
 
-@Composable
-fun SelectedItemIndicator(
-    visibleItems: Int,
-    selectedItemOffset: Dp = 0.dp,
-    itemSpacing: Dp = 0.dp,
-) {
-    val itemWidth =
-        LocalConfiguration.current.screenWidthDp.dp / visibleItems
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        drawLine(
-            color = Color.Red,
-            start = Offset(x = (selectedItemOffset + itemWidth / 2).toPx(), y = 0f),
-            end = Offset(x = (selectedItemOffset + itemWidth / 2).toPx(), y = size.height),
-            strokeWidth = 2.dp.toPx()
-        )
-    }
-}
+val previewGames = listOf(
+    Game(
+        id = "1",
+        systemId = "100",
+        title = "Castlevania: Symphony of the Night",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "2",
+        systemId = "100",
+        title = "Need for Speed: Most Wanted (2005)",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "3",
+        systemId = "100",
+        title = "Metal Gear Solid",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "4",
+        systemId = "100",
+        title = "God of War",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "5",
+        systemId = "100",
+        title = "Assassin's Creed",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "6",
+        systemId = "100",
+        title = "Final Fantasy VII",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "7",
+        systemId = "100",
+        title = "The Legend of Zelda: Ocarina of Time",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "8",
+        systemId = "100",
+        title = "Super Mario Bros.",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "9",
+        systemId = "100",
+        title = "Silent Hill",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "10",
+        systemId = "100",
+        title = "Resident Evil 2",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "11",
+        systemId = "100",
+        title = "The Elder Scrolls V: Skyrim",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "12",
+        systemId = "100",
+        title = "Doom",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "13",
+        systemId = "100",
+        title = "Half-Life",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "14",
+        systemId = "100",
+        title = "Grand Theft Auto III",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "15",
+        systemId = "100",
+        title = "Minecraft",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+    Game(
+        id = "16",
+        systemId = "100",
+        title = "Terraria",
+        lastIndexedAt = 99999,
+        fileName = "file",
+        fileUri = "file.iso",
+    ),
+)
