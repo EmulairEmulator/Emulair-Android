@@ -7,6 +7,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,39 +33,12 @@ import com.bigbratan.emulair.ui.theme.removeFontPadding
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 import java.util.Locale
 
-private fun computeTitlePlaceholder(title: String): String {
-    val romanNumeralRegex = "^(M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$".toRegex()
-
-    val sanitizedName = title.replace(Regex("\\(.*\\)"), "")
-
-    if (!sanitizedName.contains(" ")) {
-        return sanitizedName
-    }
-
-    return sanitizedName.split(Regex("\\s|(?=\\p{Punct})")).asSequence()
-        .map { word ->
-            if (romanNumeralRegex.matches(word.uppercase(Locale.ROOT))) {
-                word.uppercase(Locale.ROOT)
-            } else {
-                word.firstOrNull()?.uppercaseChar().toString()
-            }
-        }
-        .filter {
-            it.firstOrNull() != null && (it.first().isDigit() or it.first()
-                .isUpperCase() or (it.first() == '&') or (it.first() == ':') or (it.first() == '.') or (it.first() == '-'))
-        }
-        .joinToString("")
-        .ifBlank { title.first().toString() }
-        .replaceFirstChar(Char::titlecase)
-}
-
 @Composable
 fun GamesListItem(
     modifier: Modifier = Modifier,
     icon: String? = null,
     iconUri: String? = null,
     title: String,
-    itemWidth: Dp,
     onGameClick: () -> Unit,
 ) {
     Box(
@@ -104,13 +80,29 @@ fun GamesListItem(
 
             else -> Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = computeTitlePlaceholder(title),
+                text = title,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = plusJakartaSans,
-                fontSize = (itemWidth / 6).value.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 style = TextStyle(platformStyle = removeFontPadding),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun GamesListItemPreview() {
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .width(150.dp)
+            .padding(16.dp),
+    ) {
+        GamesListItem(
+            title = "Game",
+            onGameClick = {},
+        )
     }
 }

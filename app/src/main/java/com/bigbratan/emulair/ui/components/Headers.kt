@@ -7,7 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Person3
+import androidx.compose.material.icons.filled.Person4
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,7 +49,7 @@ enum class TopNavDestination(val route: String) {
 
 @Composable
 fun TopNavigationBar(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -53,9 +61,9 @@ fun TopNavigationBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TransparentIconButton(
+        TonalIconButton(
             modifier = Modifier.padding(start = 32.dp),
-            imageVector = Icons.Outlined.AccountCircle,
+            imageVector = Icons.Filled.Person,
             onClick = {},
         )
 
@@ -65,14 +73,16 @@ fun TopNavigationBar(
         ) {
             Icon(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(8.dp)
                     .size(36.dp),
                 painter = painterResource(id = R.drawable.icon_lb),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = null,
             )
 
             TopNavDestination.entries.forEachIndexed { index, navDestination ->
                 Button(
+                    modifier = Modifier.padding(horizontal = 4.dp),
                     onClick = {
                         navController.navigate(navDestination.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
@@ -83,12 +93,12 @@ fun TopNavigationBar(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentRoute == navDestination.route)
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        containerColor =
+                        if (currentRoute == navDestination.route) MaterialTheme.colorScheme.surfaceVariant
                         else Color.Transparent,
-                        contentColor = if (currentRoute == navDestination.route)
-                            MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurface,
+                        contentColor =
+                        if (currentRoute == navDestination.route) MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
                     ),
                 ) {
                     Text(
@@ -106,16 +116,17 @@ fun TopNavigationBar(
 
             Icon(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(8.dp)
                     .size(36.dp),
                 painter = painterResource(id = R.drawable.icon_rb),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = null,
             )
         }
 
-        TransparentIconButton(
+        TonalIconButton(
             modifier = Modifier.padding(end = 32.dp),
-            imageVector = Icons.Outlined.Info,
+            imageVector = Icons.Filled.QuestionMark,
             onClick = {},
         )
     }

@@ -49,14 +49,14 @@ internal fun TonalIconButton(
                     color = MaterialTheme.colorScheme.primary,
                 ),
             )
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(4.dp),
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f))
+            .padding(8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             modifier = Modifier.size(16.dp),
             imageVector = imageVector,
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
             contentDescription = null,
         )
     }
@@ -79,12 +79,13 @@ internal fun TransparentIconButton(
                     color = MaterialTheme.colorScheme.primary,
                 ),
             )
-            .padding(4.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
+            modifier = Modifier.size(16.dp),
             imageVector = imageVector,
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
             contentDescription = null,
         )
     }
@@ -109,18 +110,18 @@ internal fun OutlinedIconButton(
             )
             .border(
                 BorderStroke(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
                 ),
                 shape = CircleShape
             )
-            .padding(4.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             modifier = Modifier.size(16.dp),
             imageVector = imageVector,
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
             contentDescription = null,
         )
     }
@@ -134,15 +135,15 @@ internal fun TonalTextButton(
     onClick: () -> Unit,
 ) {
     val backgroundColor = if (enabled) {
-        MaterialTheme.colorScheme.secondaryContainer
+        MaterialTheme.colorScheme.primaryContainer
     } else {
-        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
     }
 
     val textColor = if (enabled) {
-        MaterialTheme.colorScheme.onSecondaryContainer
+        MaterialTheme.colorScheme.onPrimaryContainer
     } else {
-        MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.3f)
+        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
     }
 
     Text(
@@ -203,15 +204,15 @@ internal fun OutlinedTextButton(
     enabled: Boolean = true,
 ) {
     val borderColor = if (enabled) {
-        MaterialTheme.colorScheme.outline
+        MaterialTheme.colorScheme.primaryContainer
     } else {
-        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
     }
 
     val textColor = if (enabled) {
-        MaterialTheme.colorScheme.primary
+        MaterialTheme.colorScheme.onPrimaryContainer
     } else {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
     }
 
     Text(
@@ -223,7 +224,7 @@ internal fun OutlinedTextButton(
             }
             .border(
                 BorderStroke(
-                    width = 1.dp,
+                    width = 2.dp,
                     color = borderColor
                 ),
                 shape = RoundedCornerShape(56.dp)
@@ -242,53 +243,89 @@ internal fun OutlinedTextButton(
 @Preview
 @Composable
 private fun TonalIconButtonPreview() {
-    TonalIconButton(
-        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-        onClick = {},
-    )
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+    ) {
+        TonalIconButton(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            onClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun TransparentIconButtonPreview() {
-    TransparentIconButton(
-        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-        onClick = {},
-    )
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+    ) {
+        TransparentIconButton(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            onClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun OutlinedIconButtonPreview() {
-    OutlinedIconButton(
-        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-        onClick = {},
-    )
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+    ) {
+        OutlinedIconButton(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            onClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun TonalTextButtonPreview() {
-    TonalTextButton(
-        label = "Click me",
-        onClick = {},
-    )
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+    ) {
+        TonalTextButton(
+            label = "Click me",
+            onClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun TransparentTextButtonPreview() {
-    TransparentTextButton(
-        label = "Click me",
-        onClick = {},
-    )
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+    ) {
+        TransparentTextButton(
+            label = "Click me",
+            onClick = {},
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun OutlinedTextButtonPreview() {
-    OutlinedTextButton(
-        label = "Click me",
-        onClick = {},
-    )
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+    ) {
+        OutlinedTextButton(
+            label = "Click me",
+            onClick = {},
+        )
+    }
 }
