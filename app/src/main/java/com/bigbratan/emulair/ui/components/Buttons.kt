@@ -27,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bigbratan.emulair.ui.theme.removeFontPadding
@@ -36,6 +37,7 @@ import com.bigbratan.emulair.ui.theme.plusJakartaSans
 internal fun TonalIconButton(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
+    size: Dp = 16.dp,
     onClick: () -> Unit,
 ) {
     Box(
@@ -50,11 +52,11 @@ internal fun TonalIconButton(
                 ),
             )
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f))
-            .padding(8.dp),
+            .padding(size / 2),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(size),
             imageVector = imageVector,
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
             contentDescription = null,
@@ -66,6 +68,7 @@ internal fun TonalIconButton(
 internal fun TransparentIconButton(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
+    size: Dp = 16.dp,
     onClick: () -> Unit,
 ) {
     Box(
@@ -79,11 +82,11 @@ internal fun TransparentIconButton(
                     color = MaterialTheme.colorScheme.primary,
                 ),
             )
-            .padding(8.dp),
+            .padding(size / 2),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(size),
             imageVector = imageVector,
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
             contentDescription = null,
@@ -95,6 +98,7 @@ internal fun TransparentIconButton(
 internal fun OutlinedIconButton(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
+    size: Dp = 16.dp,
     onClick: () -> Unit,
 ) {
     Box(
@@ -110,16 +114,16 @@ internal fun OutlinedIconButton(
             )
             .border(
                 BorderStroke(
-                    width = 2.dp,
+                    width = size / 8,
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
                 ),
                 shape = CircleShape
             )
-            .padding(8.dp),
+            .padding(size / 2),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(size),
             imageVector = imageVector,
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
             contentDescription = null,

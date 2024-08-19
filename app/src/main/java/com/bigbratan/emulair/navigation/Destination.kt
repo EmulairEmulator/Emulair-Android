@@ -14,7 +14,15 @@ sealed class Destination(val route: String) {
 
         object SystemsDestination : Destination("systems")
 
+        object SystemGamesDestination : Destination("system_games")
+
         object OnlineDestination : Destination("online")
+
+        object SearchDestination : Destination("search")
+
+        object AppsDestination : Destination("apps")
+
+        object ProfileDestination : Destination("profile")
 
         object SettingsDestination : Destination("settings")
     }

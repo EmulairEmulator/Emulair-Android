@@ -1,4 +1,4 @@
-package com.bigbratan.emulair.ui.main.online
+package com.bigbratan.emulair.ui.main.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import com.bigbratan.emulair.ui.components.LocalTopNavHeight
 
 @Composable
-fun OnlineScreen() {
+fun SearchScreen() {
     Box(
         Modifier
             .fillMaxSize()

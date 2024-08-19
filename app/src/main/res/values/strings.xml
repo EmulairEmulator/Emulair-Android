@@ -12,6 +12,16 @@
     <string name="nav_games_title">Games</string>
     <string name="nav_systems_title">Systems</string>
     <string name="nav_online_title">Online</string>
-    <string name="nav_settings_title">Settings</string>
+    <string name="nav_search_title">Search</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+
+    <!--  -->
+    <!--  -->
+    <!--  -->
 
 </resources>

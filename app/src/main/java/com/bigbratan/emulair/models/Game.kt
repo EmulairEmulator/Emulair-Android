@@ -35,6 +35,7 @@ data class Game(
     val publisher: String? = null,
     val genre: String? = null,
     val releaseDate: Long? = null,
+    val region: String? = null,
     val lastPlayedAt: Long? = null,
     val lastIndexedAt: Long,
     val fileName: String,

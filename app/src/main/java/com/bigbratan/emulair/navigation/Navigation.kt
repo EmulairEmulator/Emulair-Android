@@ -1,63 +1,90 @@
 package com.bigbratan.emulair.navigation
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
 import com.bigbratan.emulair.ui.components.TopNavigationBar
-import com.bigbratan.emulair.ui.main.mainApp
+import com.bigbratan.emulair.ui.main.mainNavGraph
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Navigation() {
-    val viewModel: NavigationViewModel = hiltViewModel()
+fun Navigation(
+    viewModel: NavigationViewModel = hiltViewModel(),
+) {
+    val startDestinationState = viewModel.startDestinationFlow.collectAsState()
     val navController = rememberNavController()
+    val currentBackstackEntry by navController.currentBackStackEntryAsState()
 
-    val startDestination = viewModel.startDestination.collectAsState()
-    val shouldShowTopBar =
-        navController.currentBackStackEntryAsState().value?.destination?.route in listOf(
-            Destination.Main.GamesDestination.route,
-            Destination.Main.SystemsDestination.route,
-            Destination.Main.OnlineDestination.route,
-            Destination.Main.SettingsDestination.route,
+    val topBarItems = remember {
+        listOf(
+            Destination.Main.GamesDestination,
+            Destination.Main.SystemsDestination,
+            Destination.Main.OnlineDestination,
+            Destination.Main.SearchDestination,
         )
+    }
+    val shouldShowTopBar = remember {
+        derivedStateOf {
+            currentBackstackEntry?.destination?.route in topBarItems.map { it.route }
+        }
+    }
 
-    startDestination.value?.let { startDestinationValue ->
-        Scaffold(
+    startDestinationState.value?.let { startDestination ->
+        Box(
             modifier = Modifier.fillMaxSize(),
-            topBar = { if (shouldShowTopBar) TopNavigationBar(navController = navController) }
-        ) { paddingValues ->
-            val navModifier = if (shouldShowTopBar) {
-                Modifier.padding(
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding(),
+        ) {
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.TopCenter),
+                visible = shouldShowTopBar.value,
+                enter = fadeIn(animationSpec = tween(400)),
+                exit = fadeOut(animationSpec = tween(400))
+            ) {
+                TopNavigationBar(
+                    currentRoute = currentBackstackEntry?.destination?.route,
+                    onTabSwitch = { navDestination ->
+                        navController.navigate(navDestination.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onProfileClick = {
+                        navController.navigate(Destination.Main.ProfileDestination.route)
+                    },
+                    onSettingsClick = {
+                        navController.navigate(Destination.Main.SettingsDestination.route)
+                    },
                 )
-            } else {
-                Modifier
             }
 
             NavHost(
-                modifier = navModifier,
                 navController = navController,
-                startDestination = startDestinationValue,
+                startDestination = startDestination,
+                enterTransition = { fadeIn(animationSpec = tween(400)) },
+                exitTransition = { fadeOut(animationSpec = tween(400)) },
             ) {
-                /*navigation(
-                    route = Destination.Onboarding.route,
-                    startDestination = Destination.Onboarding.FirstScreen.route
-                ) { onboardingApp(navController = navController) }*/
-
-                navigation(
-                    route = Destination.Main.route,
-                    startDestination = Destination.Main.GamesDestination.route
-                ) { mainApp(navController = navController) }
+                mainNavGraph(
+                    onBackClick = { navController.popBackStack() },
+                )
             }
         }
     }

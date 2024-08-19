@@ -4,59 +4,55 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Person3
-import androidx.compose.material.icons.filled.Person4
-import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.sp
 import com.bigbratan.emulair.R
 import com.bigbratan.emulair.navigation.Destination
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
+import com.bigbratan.emulair.ui.theme.removeFontPadding
 
-enum class TopNavDestination(val route: String) {
-    GAMES(Destination.Main.GamesDestination.route),
-    SYSTEMS(Destination.Main.SystemsDestination.route),
-    ONLINE(Destination.Main.OnlineDestination.route),
-    SETTINGS(Destination.Main.SettingsDestination.route),
+enum class TopNavDestination(val route: String, val title: Int) {
+    GAMES(Destination.Main.GamesDestination.route, R.string.nav_games_title),
+    SYSTEMS(Destination.Main.SystemsDestination.route, R.string.nav_systems_title),
+    ONLINE(Destination.Main.OnlineDestination.route, R.string.nav_online_title),
+    SEARCH(Destination.Main.SearchDestination.route, R.string.nav_search_title),
 }
+
+val topNavHeight = 48.dp
+val LocalTopNavHeight = compositionLocalOf { topNavHeight }
 
 @Composable
 fun TopNavigationBar(
-    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    currentRoute: String? = null,
+    onTabSwitch: (TopNavDestination) -> Unit,
+    onProfileClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
+            .height(topNavHeight)
             .background(MaterialTheme.colorScheme.surface),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -64,70 +60,95 @@ fun TopNavigationBar(
         TonalIconButton(
             modifier = Modifier.padding(start = 32.dp),
             imageVector = Icons.Filled.Person,
-            onClick = {},
+            onClick = { onProfileClick() },
         )
 
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
+            // TODO: SHOW LB/RB ICONS ONLY WHEN GAME PAD IS CONNECTED
+            /* Icon(
                 modifier = Modifier
                     .padding(8.dp)
                     .size(36.dp),
                 painter = painterResource(id = R.drawable.icon_lb),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = null,
-            )
+            ) */
 
             TopNavDestination.entries.forEachIndexed { index, navDestination ->
                 Button(
                     modifier = Modifier.padding(horizontal = 4.dp),
-                    onClick = {
-                        navController.navigate(navDestination.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
+                    onClick = { onTabSwitch(navDestination) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                        if (currentRoute == navDestination.route) MaterialTheme.colorScheme.surfaceVariant
-                        else Color.Transparent,
-                        contentColor =
-                        if (currentRoute == navDestination.route) MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        containerColor = if (currentRoute == navDestination.route) {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        } else {
+                            Color.Transparent
+                        },
+                        contentColor = if (currentRoute == navDestination.route) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                     ),
                 ) {
                     Text(
-                        text = when (navDestination) {
-                            TopNavDestination.GAMES -> stringResource(id = R.string.nav_games_title)
-                            TopNavDestination.SYSTEMS -> stringResource(id = R.string.nav_systems_title)
-                            TopNavDestination.ONLINE -> stringResource(id = R.string.nav_online_title)
-                            TopNavDestination.SETTINGS -> stringResource(id = R.string.nav_settings_title)
-                        },
+                        text = stringResource(id = navDestination.title),
                         fontFamily = plusJakartaSans,
                         fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        style = TextStyle(platformStyle = removeFontPadding),
                     )
                 }
             }
 
-            Icon(
+            /* Icon(
                 modifier = Modifier
                     .padding(8.dp)
                     .size(36.dp),
                 painter = painterResource(id = R.drawable.icon_rb),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 contentDescription = null,
-            )
+            ) */
         }
 
         TonalIconButton(
             modifier = Modifier.padding(end = 32.dp),
-            imageVector = Icons.Filled.QuestionMark,
-            onClick = {},
+            imageVector = Icons.Filled.Settings,
+            onClick = { onSettingsClick() },
+        )
+    }
+}
+
+@Composable
+fun TopTitleBar(
+    modifier: Modifier = Modifier,
+    title: String,
+    onBackClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(topNavHeight)
+            .background(MaterialTheme.colorScheme.surface),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TonalIconButton(
+            modifier = Modifier.padding(start = 32.dp),
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            onClick = { onBackClick() },
+        )
+
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = title,
+            fontFamily = plusJakartaSans,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            style = TextStyle(platformStyle = removeFontPadding),
         )
     }
 }
@@ -136,6 +157,17 @@ fun TopNavigationBar(
 @Composable
 fun TopNavigationBarPreview() {
     TopNavigationBar(
-        navController = rememberNavController()
+        onTabSwitch = {},
+        onProfileClick = {},
+        onSettingsClick = {},
+    )
+}
+
+@Preview(widthDp = 800)
+@Composable
+fun TopTitleBarPreview() {
+    TopTitleBar(
+        title = "Title",
+        onBackClick = {},
     )
 }
