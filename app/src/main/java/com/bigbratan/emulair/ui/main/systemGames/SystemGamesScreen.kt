@@ -17,10 +17,10 @@ import com.bigbratan.emulair.ui.components.TopTitleBar
 
 @Composable
 fun SystemGamesScreen(
-    // systemId: Int,
+    systemId: Int,
     onGameClick: (gameId: Int) -> Unit,
     onAchievementsClick: (gameId: Int) -> Unit,
-    onSystemOptionsClick: (gameId: Int?, systemId: Int) -> Unit,
+    onSystemOptionsClick: (systemId: Int) -> Unit,
     onBackClick: () -> Unit,
 ) {
     Box(

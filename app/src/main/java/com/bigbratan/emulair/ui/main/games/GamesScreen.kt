@@ -75,7 +75,7 @@ fun GamesScreen(
     viewModel: GamesViewModel = hiltViewModel(),
     onGameClick: (gameId: Int) -> Unit,
     onAchievementsClick: (gmeId: Int) -> Unit,
-    onGameOptionsClick: (gameId: Int, systemId: Int?) -> Unit,
+    onGameOptionsClick: (gameId: Int) -> Unit,
 ) {
     val gamesState by viewModel.gamesFlow.collectAsState()
 
@@ -116,7 +116,7 @@ private fun GamesView(
     games: List<GameItemViewModel>,
     onGameClick: (gameId: Int) -> Unit,
     onAchievementsClick: (gameId: Int) -> Unit,
-    onGameOptionsClick: (gameId: Int, systemId: Int?) -> Unit,
+    onGameOptionsClick: (gameId: Int) -> Unit,
 ) {
     val localConfiguration = LocalConfiguration.current
     val screenWidth by remember { mutableStateOf(localConfiguration.screenWidthDp.dp) }
@@ -313,7 +313,7 @@ private fun GamesView(
             TonalIconButton(
                 imageVector = Icons.Filled.Tune,
                 size = 24.dp,
-                onClick = { onGameOptionsClick(games[pagerState.currentPage].id, null) }
+                onClick = { onGameOptionsClick(games[pagerState.currentPage].id) }
             )
         }
     }

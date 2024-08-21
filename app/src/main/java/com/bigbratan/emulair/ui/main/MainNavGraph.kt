@@ -20,7 +20,8 @@ fun NavGraphBuilder.mainNavGraph(
     onBackClick: () -> Unit,
     onGameClick: (gameId: Int) -> Unit,
     onAchievementsClick: (gameId: Int) -> Unit,
-    onCoreOptionsClick: (gameId: Int?, systemId: Int?) -> Unit,
+    onGameOptionsClick: (gameId: Int?) -> Unit,
+    onSystemOptionsClick: (systemId: Int?) -> Unit,
 ) {
     navigation(
         route = Destination.Main.route,
@@ -30,7 +31,7 @@ fun NavGraphBuilder.mainNavGraph(
             GamesScreen(
                 onGameClick = onGameClick,
                 onAchievementsClick = onAchievementsClick,
-                onGameOptionsClick = onCoreOptionsClick,
+                onGameOptionsClick = onGameOptionsClick,
             )
         }
 
@@ -38,11 +39,17 @@ fun NavGraphBuilder.mainNavGraph(
             SystemsScreen()
         }
 
-        composable(route = Destination.Main.SystemGamesDestination.route) {
+        composable(
+            route = Destination.Main.SystemGamesDestination.routeWithArgs("{systemId}"),
+            arguments = listOf(
+                navArgument("systemId") { type = NavType.IntType },
+            ),
+        ) { backStackEntry ->
             SystemGamesScreen(
+                systemId = backStackEntry.arguments?.getInt("systemId") ?: 0,
                 onGameClick = onGameClick,
                 onAchievementsClick = onAchievementsClick,
-                onSystemOptionsClick = onCoreOptionsClick,
+                onSystemOptionsClick = onSystemOptionsClick,
                 onBackClick = onBackClick,
             )
         }
@@ -72,18 +79,27 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(
-            route = Destination.Main.CoreOptionsDestination.routeWithArgs(
-                "{gameId}",
-                "{systemId}"
-            ),
+            route = Destination.Main.GameOptionsDestination.routeWithArgs("{gameId}"),
             arguments = listOf(
-                navArgument("gameId") { type = NavType.StringType },
-                navArgument("systemId") { type = NavType.StringType },
+                navArgument("gameId") { type = NavType.IntType },
             )
         ) { backStackEntry ->
             CoreOptionsScreen(
-                gameId = backStackEntry.arguments?.getString("gameId"),
-                systemId = backStackEntry.arguments?.getString("systemId"),
+                gameId = backStackEntry.arguments?.getString("gameId")?.toInt(),
+                systemId = null,
+                onBackClick = onBackClick,
+            )
+        }
+
+        composable(
+            route = Destination.Main.SystemOptionsDestination.routeWithArgs("{systemId}"),
+            arguments = listOf(
+                navArgument("systemId") { type = NavType.IntType },
+            )
+        ) { backStackEntry ->
+            CoreOptionsScreen(
+                gameId = null,
+                systemId = backStackEntry.arguments?.getString("systemId")?.toInt(),
                 onBackClick = onBackClick,
             )
         }

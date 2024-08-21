@@ -17,8 +17,8 @@ import com.bigbratan.emulair.ui.components.TopTitleBar
 
 @Composable
 fun CoreOptionsScreen(
-    gameId: String? = "#",
-    systemId: String? = "#",
+    gameId: Int? = null,
+    systemId: Int? = null,
     onBackClick: () -> Unit,
 ) {
     Box(

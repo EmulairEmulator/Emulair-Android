@@ -1,32 +1,34 @@
 package com.bigbratan.emulair.navigation
 
 sealed class Destination(val route: String) {
-    object Onboarding : Destination("onboarding") {
-        object WelcomeDestination : Destination("welcome")
+    data object Onboarding : Destination("onboarding") {
+        data object WelcomeDestination : Destination("welcome")
 
-        object PickGamesFolderDestination : Destination("pick_games_folder")
+        data object PickGamesFolderDestination : Destination("pick_games_folder")
 
-        object CreateSystemFolderDestination : Destination("create_system_folder")
+        data object CreateSystemFolderDestination : Destination("create_system_folder")
     }
 
-    object Main : Destination("main") {
-        object GamesDestination : Destination("games")
+    data object Main : Destination("main") {
+        data object GamesDestination : Destination("games")
 
-        object SystemsDestination : Destination("systems")
+        data object SystemsDestination : Destination("systems")
 
-        object SystemGamesDestination : Destination("system_games")
+        data object SystemGamesDestination : Destination("system_games")
 
-        object OnlineDestination : Destination("online")
+        data object OnlineDestination : Destination("online")
 
-        object SearchDestination : Destination("search")
+        data object SearchDestination : Destination("search")
 
-        object AppsDestination : Destination("apps")
+        data object AppsDestination : Destination("apps")
 
-        object ProfileDestination : Destination("profile")
+        data object ProfileDestination : Destination("profile")
 
-        object SettingsDestination : Destination("settings")
+        data object SettingsDestination : Destination("settings")
 
-        object CoreOptionsDestination : Destination("core_options")
+        data object SystemOptionsDestination : Destination("system_options")
+
+        data object GameOptionsDestination : Destination("game_options")
     }
 
     fun routeWithArgs(vararg args: String): String {

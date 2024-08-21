@@ -84,13 +84,19 @@ fun Navigation(
             ) {
                 mainNavGraph(
                     onBackClick = { navController.popBackStack() },
-                    onGameClick = {},
-                    onAchievementsClick = {},
-                    onCoreOptionsClick = { gameId, systemId ->
+                    onGameClick = { gameId -> },
+                    onAchievementsClick = { gameId -> },
+                    onGameOptionsClick = { gameId ->
                         navController.navigate(
-                            Destination.Main.CoreOptionsDestination.routeWithArgs(
-                                gameId?.toString() ?: "#",
-                                systemId?.toString() ?: "#",
+                            Destination.Main.GameOptionsDestination.routeWithArgs(
+                                gameId.toString(),
+                            )
+                        )
+                    },
+                    onSystemOptionsClick = { systemId ->
+                        navController.navigate(
+                            Destination.Main.SystemOptionsDestination.routeWithArgs(
+                                systemId.toString(),
                             )
                         )
                     },
