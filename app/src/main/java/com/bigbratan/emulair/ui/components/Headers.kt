@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -32,10 +31,10 @@ import com.bigbratan.emulair.ui.theme.plusJakartaSans
 import com.bigbratan.emulair.ui.theme.removeFontPadding
 
 enum class TopNavDestination(val route: String, val title: Int) {
-    GAMES(Destination.Main.GamesDestination.route, R.string.nav_games_title),
-    SYSTEMS(Destination.Main.SystemsDestination.route, R.string.nav_systems_title),
-    ONLINE(Destination.Main.OnlineDestination.route, R.string.nav_online_title),
-    SEARCH(Destination.Main.SearchDestination.route, R.string.nav_search_title),
+    GAMES(Destination.Main.GamesDestination.route, R.string.games_title),
+    SYSTEMS(Destination.Main.SystemsDestination.route, R.string.systems_title),
+    ONLINE(Destination.Main.OnlineDestination.route, R.string.online_title),
+    SEARCH(Destination.Main.SearchDestination.route, R.string.search_title),
 }
 
 val topNavHeight = 48.dp

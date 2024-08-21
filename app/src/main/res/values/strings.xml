@@ -8,19 +8,31 @@
     <string name="action_positive_title">OK</string>
     <string name="action_negative_title">Cancel</string>
 
-    <!-- Top Navigation -->
-    <string name="nav_games_title">Games</string>
-    <string name="nav_systems_title">Systems</string>
-    <string name="nav_online_title">Online</string>
-    <string name="nav_search_title">Search</string>
+    <!-- Games -->
+    <string name="games_title">Games</string>
 
-    <!-- Settings -->
-    <string name="settings_title">Settings</string>
+    <!-- Systems -->
+    <string name="systems_title">Systems</string>
+
+    <!-- Online -->
+    <string name="online_title">Online</string>
+
+    <!-- System Games -->
+    <string name="system_games_title">%1$s Games</string>
+
+    <!-- Search -->
+    <string name="search_title">Search</string>
+    <string name="search_hint">Search games, systems and settings...</string>
 
     <!-- Profile -->
     <string name="profile_title">Profile</string>
 
-    <!--  -->
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+
+    <!-- Core Options -->
+    <string name="core_options_title">Options</string>
+
     <!--  -->
     <!--  -->
 

@@ -1,15 +1,13 @@
 package com.bigbratan.emulair.ui.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.bigbratan.emulair.navigation.Destination
 import com.bigbratan.emulair.ui.main.apps.AppsScreen
+import com.bigbratan.emulair.ui.main.coreOptions.CoreOptionsScreen
 import com.bigbratan.emulair.ui.main.games.GamesScreen
 import com.bigbratan.emulair.ui.main.online.OnlineScreen
 import com.bigbratan.emulair.ui.main.profile.ProfileScreen
@@ -20,6 +18,9 @@ import com.bigbratan.emulair.ui.main.systems.SystemsScreen
 
 fun NavGraphBuilder.mainNavGraph(
     onBackClick: () -> Unit,
+    onGameClick: (gameId: Int) -> Unit,
+    onAchievementsClick: (gameId: Int) -> Unit,
+    onCoreOptionsClick: (gameId: Int?, systemId: Int?) -> Unit,
 ) {
     navigation(
         route = Destination.Main.route,
@@ -27,8 +28,9 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         composable(route = Destination.Main.GamesDestination.route) {
             GamesScreen(
-                onGameClick = {},
-                onAchievementsClick = {},
+                onGameClick = onGameClick,
+                onAchievementsClick = onAchievementsClick,
+                onGameOptionsClick = onCoreOptionsClick,
             )
         }
 
@@ -37,7 +39,12 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(route = Destination.Main.SystemGamesDestination.route) {
-            SystemGamesScreen()
+            SystemGamesScreen(
+                onGameClick = onGameClick,
+                onAchievementsClick = onAchievementsClick,
+                onSystemOptionsClick = onCoreOptionsClick,
+                onBackClick = onBackClick,
+            )
         }
 
         composable(route = Destination.Main.OnlineDestination.route) {
@@ -50,7 +57,7 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(route = Destination.Main.ProfileDestination.route) {
             ProfileScreen(
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
             )
         }
 
@@ -60,7 +67,24 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(route = Destination.Main.SettingsDestination.route) {
             SettingsScreen(
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+            )
+        }
+
+        composable(
+            route = Destination.Main.CoreOptionsDestination.routeWithArgs(
+                "{gameId}",
+                "{systemId}"
+            ),
+            arguments = listOf(
+                navArgument("gameId") { type = NavType.StringType },
+                navArgument("systemId") { type = NavType.StringType },
+            )
+        ) { backStackEntry ->
+            CoreOptionsScreen(
+                gameId = backStackEntry.arguments?.getString("gameId"),
+                systemId = backStackEntry.arguments?.getString("systemId"),
+                onBackClick = onBackClick,
             )
         }
     }

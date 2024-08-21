@@ -25,6 +25,8 @@ sealed class Destination(val route: String) {
         object ProfileDestination : Destination("profile")
 
         object SettingsDestination : Destination("settings")
+
+        object CoreOptionsDestination : Destination("core_options")
     }
 
     fun routeWithArgs(vararg args: String): String {

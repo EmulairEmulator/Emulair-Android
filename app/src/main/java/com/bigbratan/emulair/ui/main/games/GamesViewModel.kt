@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.bigbratan.emulair.models.Game
 import com.bigbratan.emulair.services.GamesService
 import com.bigbratan.emulair.utils.DataState
+import com.bigbratan.emulair.utils.formatCompany
+import com.bigbratan.emulair.utils.formatDate
+import com.bigbratan.emulair.utils.formatTitlePlaceholder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -41,14 +44,13 @@ data class GameItemViewModel(
     private val game: Game,
 ) {
     val id = game.id
-    val systemId = game.systemId
     val systemName = when (game.systemId) {
-        "1" -> "PlayStation"
-        "2" -> "PlayStation 2"
-        "3" -> "PlayStation Portable"
-        "4" -> "Nintendo Entertainment System"
-        "5" -> "Super Nintendo Entertainment System"
-        "6" -> "Game Boy Advance"
+        1 -> "PlayStation"
+        2 -> "PlayStation 2"
+        3 -> "PlayStation Portable"
+        4 -> "Nintendo Entertainment System"
+        5 -> "Super Nintendo Entertainment System"
+        6 -> "Game Boy Advance"
         else -> "Unknown"
     }
     val fullTitle = game.fullTitle
@@ -63,6 +65,7 @@ data class GameItemViewModel(
     val genre = game.genre
     val releaseDate = game.releaseDate?.let { formatDate(it) }
     val region = game.region
+    val details = concatDetails(this)
     val lastPlayedAt = game.lastPlayedAt
     val lastIndexedAt = game.lastIndexedAt
     val fileName = game.fileName
@@ -73,56 +76,16 @@ data class GameItemViewModel(
     val audioBgmUri = game.audioBgmUri
 }
 
-private fun formatTitlePlaceholder(title: String): String {
-    val romanNumeralRegex = "^(M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$".toRegex()
+private fun concatDetails(game: GameItemViewModel): String {
+    val details = mutableListOf<String>()
 
-    val sanitizedName = title.replace(Regex("\\(.*\\)"), "").trim()
-
-    if (!sanitizedName.contains(" ")) {
-        return when {
-            sanitizedName.length > 10 -> {
-                val consonants = sanitizedName.filter { it.lowercaseChar() !in "aeiou" }
-                if (consonants.length > 10) {
-                    "${sanitizedName.take(10)}."
-                } else {
-                    consonants
-                }
-            }
-
-            else -> sanitizedName
-        }
+    game.developer?.let { developer -> details.add(developer) }
+    if (game.developer != game.publisher) {
+        game.publisher?.let { publisher -> details.add(publisher) }
     }
+    game.genre?.let { genre -> details.add(genre) }
+    game.releaseDate?.let { releaseDate -> details.add(releaseDate) }
+    game.region?.let { region -> details.add(region) }
 
-    return sanitizedName.split(Regex("\\s|(?=\\p{Punct})")).asSequence()
-        .map { word ->
-            if (romanNumeralRegex.matches(word.uppercase(Locale.ROOT))) {
-                word.uppercase(Locale.ROOT)
-            } else {
-                word.firstOrNull()?.uppercaseChar().toString()
-            }
-        }
-        .filter {
-            it.firstOrNull() != null && (it.first().isDigit() or it.first()
-                .isUpperCase() or (it.first() == '&') or (it.first() == ':') or (it.first() == '.') or (it.first() == '-'))
-        }
-        .joinToString("")
-        .ifBlank { title.first().toString() }
-        .replaceFirstChar(Char::titlecase)
-}
-
-private fun formatDate(dateInMilliseconds: Long): String {
-    val date = Date(dateInMilliseconds)
-    val format = SimpleDateFormat("yyyy", Locale.getDefault())
-
-    return format.format(date)
-}
-
-private fun formatCompany(input: String): String {
-    val words = input.split(" ")
-
-    return if (words.size > 2) {
-        words.joinToString("") { it.first().toString() }
-    } else {
-        input
-    }
+    return details.joinToString(" · ")
 }

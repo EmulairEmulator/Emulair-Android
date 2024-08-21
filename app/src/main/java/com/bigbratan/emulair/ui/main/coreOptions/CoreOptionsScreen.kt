@@ -1,4 +1,4 @@
-package com.bigbratan.emulair.ui.main.systemGames
+package com.bigbratan.emulair.ui.main.coreOptions
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +16,9 @@ import com.bigbratan.emulair.ui.components.LocalTopNavHeight
 import com.bigbratan.emulair.ui.components.TopTitleBar
 
 @Composable
-fun SystemGamesScreen(
-    // systemId: Int,
-    onGameClick: (gameId: Int) -> Unit,
-    onAchievementsClick: (gameId: Int) -> Unit,
-    onSystemOptionsClick: (gameId: Int?, systemId: Int) -> Unit,
+fun CoreOptionsScreen(
+    gameId: String? = "#",
+    systemId: String? = "#",
     onBackClick: () -> Unit,
 ) {
     Box(
@@ -29,7 +27,7 @@ fun SystemGamesScreen(
             .background(Color.Transparent)
     ) {
         TopTitleBar(
-            title = stringResource(id = R.string.system_games_title),
+            title = stringResource(id = R.string.core_options_title),
             onBackClick = onBackClick
         )
 

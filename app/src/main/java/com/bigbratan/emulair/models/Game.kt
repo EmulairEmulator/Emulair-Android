@@ -23,8 +23,8 @@ import androidx.room.PrimaryKey
 @Immutable
 data class Game(
     @PrimaryKey(autoGenerate = true)
-    val id: String,
-    val systemId: String,
+    val id: Int,
+    val systemId: Int,
     val fullTitle: String,
     val displayTitle: String,
     val icon: String? = null,

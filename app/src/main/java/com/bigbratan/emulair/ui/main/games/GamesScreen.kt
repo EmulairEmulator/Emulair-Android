@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -72,8 +73,9 @@ const val timeUntilScrollStarts = 360L
 @Composable
 fun GamesScreen(
     viewModel: GamesViewModel = hiltViewModel(),
-    onGameClick: (id: String) -> Unit,
-    onAchievementsClick: (id: String) -> Unit,
+    onGameClick: (gameId: Int) -> Unit,
+    onAchievementsClick: (gmeId: Int) -> Unit,
+    onGameOptionsClick: (gameId: Int, systemId: Int?) -> Unit,
 ) {
     val gamesState by viewModel.gamesFlow.collectAsState()
 
@@ -98,6 +100,7 @@ fun GamesScreen(
                         games = games,
                         onGameClick = onGameClick,
                         onAchievementsClick = onAchievementsClick,
+                        onGameOptionsClick = onGameOptionsClick,
                     )
                 },
                 onError = {
@@ -111,8 +114,9 @@ fun GamesScreen(
 @Composable
 private fun GamesView(
     games: List<GameItemViewModel>,
-    onGameClick: (id: String) -> Unit,
-    onAchievementsClick: (id: String) -> Unit,
+    onGameClick: (gameId: Int) -> Unit,
+    onAchievementsClick: (gameId: Int) -> Unit,
+    onGameOptionsClick: (gameId: Int, systemId: Int?) -> Unit,
 ) {
     val localConfiguration = LocalConfiguration.current
     val screenWidth by remember { mutableStateOf(localConfiguration.screenWidthDp.dp) }
@@ -141,32 +145,8 @@ private fun GamesView(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
-        val gameDetails = mutableListOf<String>()
-
-        games[currentFocusedItem.intValue].developer?.let { developer ->
-            gameDetails.add(developer)
-        }
-
-        if (games[currentFocusedItem.intValue].developer != games[currentFocusedItem.intValue].publisher) {
-            games[currentFocusedItem.intValue].publisher?.let { publisher ->
-                gameDetails.add(publisher)
-            }
-        }
-
-        games[currentFocusedItem.intValue].genre?.let { genre ->
-            gameDetails.add(genre)
-        }
-
-        games[currentFocusedItem.intValue].releaseDate?.let { releaseDate ->
-            gameDetails.add(releaseDate)
-        }
-
-        games[currentFocusedItem.intValue].region?.let { region ->
-            gameDetails.add(region)
-        }
-
         Text(
-            text = gameDetails.joinToString(" · "),
+            text = games[currentFocusedItem.intValue].details,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.60f),
             fontFamily = plusJakartaSans,
             fontSize = 16.sp,
@@ -323,15 +303,17 @@ private fun GamesView(
             TonalIconButton(
                 imageVector = Icons.Filled.FavoriteBorder,
                 size = 24.dp,
-                onClick = {}
+                onClick = {
+                    // TODO: IMPLEMENT FAVORITE FUNCTIONALITY
+                }
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             TonalIconButton(
-                imageVector = Icons.Filled.Settings,
+                imageVector = Icons.Filled.Tune,
                 size = 24.dp,
-                onClick = {}
+                onClick = { onGameOptionsClick(games[pagerState.currentPage].id, null) }
             )
         }
     }
