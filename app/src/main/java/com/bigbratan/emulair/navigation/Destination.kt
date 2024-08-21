@@ -26,9 +26,9 @@ sealed class Destination(val route: String) {
 
         data object SettingsDestination : Destination("settings")
 
-        data object SystemOptionsDestination : Destination("system_options")
-
         data object GameOptionsDestination : Destination("game_options")
+
+        data object SystemOptionsDestination : Destination("system_options")
     }
 
     fun routeWithArgs(vararg args: String): String {

@@ -25,7 +25,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
@@ -74,7 +73,7 @@ const val timeUntilScrollStarts = 360L
 fun GamesScreen(
     viewModel: GamesViewModel = hiltViewModel(),
     onGameClick: (gameId: Int) -> Unit,
-    onAchievementsClick: (gmeId: Int) -> Unit,
+    onAchievementsClick: (gameId: Int) -> Unit,
     onGameOptionsClick: (gameId: Int) -> Unit,
 ) {
     val gamesState by viewModel.gamesFlow.collectAsState()
