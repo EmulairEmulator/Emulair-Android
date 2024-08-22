@@ -73,21 +73,6 @@ fun TopNavigationBar(
                 onNext = { computeNextDestination(toTopNavDestination(currentDestination)) },
                 onPrevious = { computePreviousDestination(toTopNavDestination(currentDestination)) },
             ),
-            /* .onKeyEvent { event ->
-                when {
-                    event.key == Key.ButtonL1 && event.type == KeyEventType.KeyDown -> {
-                        onTabSwitch(computePreviousDestination(toTopNavDestination(currentDestination)))
-                        true
-                    }
-
-                    event.key == Key.ButtonR1 && event.type == KeyEventType.KeyDown -> {
-                        onTabSwitch(computeNextDestination(toTopNavDestination(currentDestination)))
-                        true
-                    }
-
-                    else -> false
-                }
-            }, */
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
