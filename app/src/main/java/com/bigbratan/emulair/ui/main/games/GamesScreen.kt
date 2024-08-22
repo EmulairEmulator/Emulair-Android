@@ -1,7 +1,5 @@
 package com.bigbratan.emulair.ui.main.games
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -44,11 +42,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -60,14 +53,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.bigbratan.emulair.ui.components.GamesListItem
 import com.bigbratan.emulair.ui.components.LocalTopNavHeight
 import com.bigbratan.emulair.ui.components.TonalIconButton
+import com.bigbratan.emulair.ui.components.TopNavDestination
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 import com.bigbratan.emulair.ui.theme.removeFontPadding
+import com.bigbratan.emulair.utils.onListScroll
+import com.bigbratan.emulair.utils.onShoulderButtonPress
 import com.bigbratan.emulair.utils.perform
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
-
-const val timeUntilScrollStarts = 360L
 
 @Composable
 fun GamesScreen(
@@ -75,13 +68,20 @@ fun GamesScreen(
     onGameClick: (gameId: Int) -> Unit,
     onAchievementsClick: (gameId: Int) -> Unit,
     onGameOptionsClick: (gameId: Int) -> Unit,
+    onTabSwitch: (TopNavDestination) -> Unit,
 ) {
     val gamesState by viewModel.gamesFlow.collectAsState()
 
     Box(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
+            .onShoulderButtonPress(
+                nextDestination = TopNavDestination.SYSTEMS,
+                previousDestination = TopNavDestination.SEARCH,
+                onNext = { onTabSwitch(TopNavDestination.SYSTEMS) },
+                onPrevious = { onTabSwitch(TopNavDestination.SEARCH) },
+            ),
     ) {
         Column(
             modifier = Modifier
@@ -120,13 +120,12 @@ private fun GamesView(
     val localConfiguration = LocalConfiguration.current
     val screenWidth by remember { mutableStateOf(localConfiguration.screenWidthDp.dp) }
     val itemSpacing by remember { mutableStateOf(16.dp) }
-    val itemWidth by remember { mutableStateOf(100.dp) }
     val itemCount by remember { mutableIntStateOf(games.size) }
+    val itemWidth by remember { mutableStateOf(100.dp) }
 
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val currentFocusedItem = remember { mutableIntStateOf(0) }
-    val isLongPressing = remember { mutableStateOf(false) }
     val pagerState = rememberPagerState(pageCount = { itemCount })
 
     LaunchedEffect(Unit) {
@@ -161,37 +160,15 @@ private fun GamesView(
             .fillMaxWidth()
             .focusRequester(focusRequester)
             .focusable()
-            .onKeyEvent { event ->
-                when {
-                    (event.key == Key.DirectionRight || event.key == Key.DirectionLeft) && event.type == KeyEventType.KeyDown -> {
-                        val direction = if (event.key == Key.DirectionRight) 1 else -1
-                        isLongPressing.value = true
-
-                        coroutineScope.launch {
-                            while (isLongPressing.value) {
-                                val newPage = (pagerState.currentPage + direction)
-                                    .coerceIn(0, itemCount - 1)
-
-                                pagerState.animateScrollToPage(
-                                    page = newPage,
-                                    animationSpec = spring(stiffness = Spring.StiffnessHigh),
-                                )
-                                currentFocusedItem.intValue = newPage
-                                focusRequester.requestFocus()
-                                delay(timeUntilScrollStarts)
-                            }
-                        }
-                        true
-                    }
-
-                    (event.key == Key.DirectionRight || event.key == Key.DirectionLeft) && event.type == KeyEventType.KeyUp -> {
-                        isLongPressing.value = false
-                        true
-                    }
-
-                    else -> false
-                }
-            },
+            .onListScroll(
+                coroutineScope = coroutineScope,
+                pagerState = pagerState,
+                itemCount = itemCount,
+                currentFocusedItem = currentFocusedItem,
+                onKeyEvent = {
+                    focusRequester.requestFocus()
+                },
+            ),
     ) {
         HorizontalPager(
             modifier = Modifier,

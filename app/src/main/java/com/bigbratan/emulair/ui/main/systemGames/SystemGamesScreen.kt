@@ -24,7 +24,7 @@ fun SystemGamesScreen(
     onBackClick: () -> Unit,
 ) {
     Box(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
     ) {

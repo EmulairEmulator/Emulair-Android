@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun AppsScreen() {
     Box(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
     ) {

@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -47,7 +49,9 @@ fun Navigation(
 
     startDestinationState.value?.let { startDestination ->
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent),
         ) {
             AnimatedVisibility(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -56,7 +60,7 @@ fun Navigation(
                 exit = fadeOut(animationSpec = tween(400))
             ) {
                 TopNavigationBar(
-                    currentRoute = currentBackstackEntry?.destination?.route,
+                    currentDestination = currentBackstackEntry?.destination,
                     onTabSwitch = { navDestination ->
                         navController.navigate(navDestination.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
@@ -83,22 +87,32 @@ fun Navigation(
                 exitTransition = { fadeOut(animationSpec = tween(400)) },
             ) {
                 mainNavGraph(
-                    onBackClick = { navController.popBackStack() },
-                    onGameClick = { gameId -> },
-                    onAchievementsClick = { gameId -> },
-                    onGameOptionsClick = { gameId ->
+                    navigateBack = { navController.popBackStack() },
+                    navigateToGame = { gameId -> },
+                    navigateToAchievements = { gameId -> },
+                    navigateToGameOptions = { gameId ->
                         navController.navigate(
                             Destination.Main.GameOptionsDestination.routeWithArgs(
                                 gameId.toString(),
                             )
                         )
                     },
-                    onSystemOptionsClick = { systemId ->
+                    navigateToSystemOptions = { systemId ->
                         navController.navigate(
                             Destination.Main.SystemOptionsDestination.routeWithArgs(
                                 systemId.toString(),
                             )
                         )
+                    },
+                    navigateToTab = { navDestination ->
+                        navController.navigate(navDestination.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     },
                 )
             }

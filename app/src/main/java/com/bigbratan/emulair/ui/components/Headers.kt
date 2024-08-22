@@ -25,10 +25,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination
 import com.bigbratan.emulair.R
 import com.bigbratan.emulair.navigation.Destination
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 import com.bigbratan.emulair.ui.theme.removeFontPadding
+import com.bigbratan.emulair.utils.computeNextDestination
+import com.bigbratan.emulair.utils.computePreviousDestination
+import com.bigbratan.emulair.utils.onShoulderButtonPress
 
 enum class TopNavDestination(val route: String, val title: Int) {
     GAMES(Destination.Main.GamesDestination.route, R.string.games_title),
@@ -40,10 +44,20 @@ enum class TopNavDestination(val route: String, val title: Int) {
 val topNavHeight = 48.dp
 val LocalTopNavHeight = compositionLocalOf { topNavHeight }
 
+fun toTopNavDestination(navDestination: NavDestination?): TopNavDestination {
+    return when (navDestination?.route) {
+        Destination.Main.GamesDestination.route -> TopNavDestination.GAMES
+        Destination.Main.SystemsDestination.route -> TopNavDestination.SYSTEMS
+        Destination.Main.OnlineDestination.route -> TopNavDestination.ONLINE
+        Destination.Main.SearchDestination.route -> TopNavDestination.SEARCH
+        else -> TopNavDestination.GAMES
+    }
+}
+
 @Composable
 fun TopNavigationBar(
     modifier: Modifier = Modifier,
-    currentRoute: String? = null,
+    currentDestination: NavDestination? = null,
     onTabSwitch: (TopNavDestination) -> Unit,
     onProfileClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -52,7 +66,28 @@ fun TopNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(topNavHeight)
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface)
+            .onShoulderButtonPress(
+                nextDestination = computeNextDestination(toTopNavDestination(currentDestination)),
+                previousDestination = computePreviousDestination(toTopNavDestination(currentDestination)),
+                onNext = { computeNextDestination(toTopNavDestination(currentDestination)) },
+                onPrevious = { computePreviousDestination(toTopNavDestination(currentDestination)) },
+            ),
+            /* .onKeyEvent { event ->
+                when {
+                    event.key == Key.ButtonL1 && event.type == KeyEventType.KeyDown -> {
+                        onTabSwitch(computePreviousDestination(toTopNavDestination(currentDestination)))
+                        true
+                    }
+
+                    event.key == Key.ButtonR1 && event.type == KeyEventType.KeyDown -> {
+                        onTabSwitch(computeNextDestination(toTopNavDestination(currentDestination)))
+                        true
+                    }
+
+                    else -> false
+                }
+            }, */
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -76,17 +111,17 @@ fun TopNavigationBar(
                 contentDescription = null,
             ) */
 
-            TopNavDestination.entries.forEachIndexed { index, navDestination ->
+            TopNavDestination.entries.forEach { navDestination ->
                 Button(
                     modifier = Modifier.padding(horizontal = 4.dp),
                     onClick = { onTabSwitch(navDestination) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentRoute == navDestination.route) {
+                        containerColor = if (currentDestination?.route == navDestination.route) {
                             MaterialTheme.colorScheme.surfaceVariant
                         } else {
                             Color.Transparent
                         },
-                        contentColor = if (currentRoute == navDestination.route) {
+                        contentColor = if (currentDestination?.route == navDestination.route) {
                             MaterialTheme.colorScheme.onSurface
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
