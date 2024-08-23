@@ -19,7 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bigbratan.emulair.ui.components.LocalTopNavHeight
 import com.bigbratan.emulair.ui.components.TopNavDestination
+import com.bigbratan.emulair.utils.next
 import com.bigbratan.emulair.utils.onShoulderButtonPress
+import com.bigbratan.emulair.utils.previous
 
 @Composable
 fun SystemsScreen(
@@ -28,23 +30,17 @@ fun SystemsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .focusable()
+            .padding(top = LocalTopNavHeight.current)
             .background(Color.Transparent)
             .onShoulderButtonPress(
-                nextDestination = TopNavDestination.ONLINE,
-                previousDestination = TopNavDestination.GAMES,
-                onNext = { onTabSwitch(TopNavDestination.ONLINE) },
-                onPrevious = { onTabSwitch(TopNavDestination.GAMES) },
+                nextDestination = TopNavDestination.SYSTEMS.next(),
+                previousDestination = TopNavDestination.SYSTEMS.previous(),
+                onNext = { onTabSwitch(TopNavDestination.SYSTEMS.next()) },
+                onPrevious = { onTabSwitch(TopNavDestination.SYSTEMS.previous()) },
             ),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = LocalTopNavHeight.current),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            SystemsView()
-        }
+        SystemsView()
     }
 }
 
@@ -56,11 +52,13 @@ private fun SystemsView() {
         focusRequester.requestFocus()
     }
 
-    Box(
+    Column(
         modifier = Modifier
-            .padding(top = 12.dp)
-            .fillMaxWidth()
-            .focusRequester(focusRequester)
-            .focusable()
-    )
+            .fillMaxSize()
+            .focusRequester(focusRequester),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
+    ) {
+
+    }
 }

@@ -1,6 +1,5 @@
 package com.bigbratan.emulair.utils
 
-import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.pager.PagerState
@@ -11,6 +10,8 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.navigation.NavDestination
+import com.bigbratan.emulair.navigation.Destination
 import com.bigbratan.emulair.ui.components.TopNavDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -27,8 +28,8 @@ fun Modifier.onListScroll(
 ): Modifier {
     return this.onKeyEvent { event ->
         when {
-            (event.key == Key.DirectionRight || event.key == Key.DirectionLeft) && event.type == KeyEventType.KeyDown -> {
-                val direction = if (event.key == Key.DirectionRight) 1 else -1
+            (event.key == Key.DirectionRight || event.key == Key.DirectionLeft || event.key == Key.A || event.key == Key.D) && event.type == KeyEventType.KeyDown -> {
+                val direction = if (event.key == Key.DirectionRight || event.key == Key.D) 1 else -1
 
                 coroutineScope.launch {
                     val newPage = (pagerState.currentPage + direction)
@@ -45,7 +46,7 @@ fun Modifier.onListScroll(
                 true
             }
 
-            (event.key == Key.DirectionRight || event.key == Key.DirectionLeft) && event.type == KeyEventType.KeyUp -> {
+            (event.key == Key.DirectionRight || event.key == Key.DirectionLeft || event.key == Key.A || event.key == Key.D) && event.type == KeyEventType.KeyUp -> {
                 true
             }
 
@@ -62,12 +63,12 @@ fun Modifier.onShoulderButtonPress(
 ): Modifier {
     return this.onKeyEvent { event ->
         when {
-            event.key == Key.ButtonL1 && event.type == KeyEventType.KeyDown -> {
+            (event.key == Key.ButtonL1 || event.key == Key.Q) && event.type == KeyEventType.KeyDown -> {
                 onPrevious(previousDestination)
                 true
             }
 
-            event.key == Key.ButtonR1 && event.type == KeyEventType.KeyDown -> {
+            (event.key == Key.ButtonR1 || event.key == Key.E) && event.type == KeyEventType.KeyDown -> {
                 onNext(nextDestination)
                 true
             }
@@ -77,16 +78,26 @@ fun Modifier.onShoulderButtonPress(
     }
 }
 
-fun computeNextDestination(currentDestination: TopNavDestination): TopNavDestination {
+fun NavDestination?.toTopNavDestination(): TopNavDestination {
+    return when (this?.route) {
+        Destination.Main.GamesDestination.route -> TopNavDestination.GAMES
+        Destination.Main.SystemsDestination.route -> TopNavDestination.SYSTEMS
+        Destination.Main.OnlineDestination.route -> TopNavDestination.ONLINE
+        Destination.Main.SearchDestination.route -> TopNavDestination.SEARCH
+        else -> TopNavDestination.GAMES
+    }
+}
+
+fun TopNavDestination.next(): TopNavDestination {
     val currentRouteIndex =
-        TopNavDestination.entries.toTypedArray().indexOfFirst { it == currentDestination }
+        TopNavDestination.entries.toTypedArray().indexOfFirst { it == this }
     val nextRouteIndex = (currentRouteIndex + 1) % TopNavDestination.entries.size
     return TopNavDestination.entries[nextRouteIndex]
 }
 
-fun computePreviousDestination(currentDestination: TopNavDestination): TopNavDestination {
+fun TopNavDestination.previous(): TopNavDestination {
     val currentRouteIndex =
-        TopNavDestination.entries.toTypedArray().indexOfFirst { it == currentDestination }
+        TopNavDestination.entries.toTypedArray().indexOfFirst { it == this }
     val previousRouteIndex =
         (currentRouteIndex - 1 + TopNavDestination.entries.size) % TopNavDestination.entries.size
     return TopNavDestination.entries[previousRouteIndex]

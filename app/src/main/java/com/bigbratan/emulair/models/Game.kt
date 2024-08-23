@@ -5,24 +5,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "games",
-    indices = [
-        Index("id", unique = true),
-        Index("fileUri", unique = true), // Same as below
-        Index("title"),
-        Index("systemId"),
-        Index("developer"),
-        Index("genre"),
-        Index("publishDate"),
-        Index("lastIndexedAt"), // TODO: [NOTICE] Am I adding lastIndexedAt in the SQLite database? Why not use shared prefs?
-        Index("lastPlayedAt"), // Same as above
-    ]
-)
-
 @Immutable
 data class Game(
-    @PrimaryKey(autoGenerate = true)
     val id: Int,
     val systemId: Int,
     val fullTitle: String,
@@ -44,4 +28,5 @@ data class Game(
     val imageBannerUri: String? = null,
     val videoBannerUri: String? = null,
     val audioBgmUri: String? = null,
+    val achievements: List<Achievement>? = null,
 )

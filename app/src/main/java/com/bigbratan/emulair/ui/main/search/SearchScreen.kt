@@ -19,7 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bigbratan.emulair.ui.components.LocalTopNavHeight
 import com.bigbratan.emulair.ui.components.TopNavDestination
+import com.bigbratan.emulair.utils.next
 import com.bigbratan.emulair.utils.onShoulderButtonPress
+import com.bigbratan.emulair.utils.previous
 
 @Composable
 fun SearchScreen(
@@ -28,23 +30,17 @@ fun SearchScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .focusable()
+            .padding(top = LocalTopNavHeight.current)
             .background(Color.Transparent)
             .onShoulderButtonPress(
-                nextDestination = TopNavDestination.GAMES,
-                previousDestination = TopNavDestination.ONLINE,
-                onNext = { onTabSwitch(TopNavDestination.GAMES) },
-                onPrevious = { onTabSwitch(TopNavDestination.ONLINE) },
+                nextDestination = TopNavDestination.SEARCH.next(),
+                previousDestination = TopNavDestination.SEARCH.previous(),
+                onNext = { onTabSwitch(TopNavDestination.SEARCH.next()) },
+                onPrevious = { onTabSwitch(TopNavDestination.SEARCH.previous()) },
             ),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = LocalTopNavHeight.current),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-        ) {
-            SearchView()
-        }
+        SearchView()
     }
 }
 
@@ -56,11 +52,13 @@ private fun SearchView() {
         focusRequester.requestFocus()
     }
 
-    Box(
+    Column(
         modifier = Modifier
-            .padding(top = 12.dp)
-            .fillMaxWidth()
-            .focusRequester(focusRequester)
-            .focusable()
-    )
+            .fillMaxSize()
+            .focusRequester(focusRequester),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
+    ) {
+
+    }
 }

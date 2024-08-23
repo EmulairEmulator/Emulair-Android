@@ -30,9 +30,10 @@ import com.bigbratan.emulair.R
 import com.bigbratan.emulair.navigation.Destination
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
 import com.bigbratan.emulair.ui.theme.removeFontPadding
-import com.bigbratan.emulair.utils.computeNextDestination
-import com.bigbratan.emulair.utils.computePreviousDestination
+import com.bigbratan.emulair.utils.next
+import com.bigbratan.emulair.utils.previous
 import com.bigbratan.emulair.utils.onShoulderButtonPress
+import com.bigbratan.emulair.utils.toTopNavDestination
 
 enum class TopNavDestination(val route: String, val title: Int) {
     GAMES(Destination.Main.GamesDestination.route, R.string.games_title),
@@ -43,16 +44,6 @@ enum class TopNavDestination(val route: String, val title: Int) {
 
 val topNavHeight = 48.dp
 val LocalTopNavHeight = compositionLocalOf { topNavHeight }
-
-fun toTopNavDestination(navDestination: NavDestination?): TopNavDestination {
-    return when (navDestination?.route) {
-        Destination.Main.GamesDestination.route -> TopNavDestination.GAMES
-        Destination.Main.SystemsDestination.route -> TopNavDestination.SYSTEMS
-        Destination.Main.OnlineDestination.route -> TopNavDestination.ONLINE
-        Destination.Main.SearchDestination.route -> TopNavDestination.SEARCH
-        else -> TopNavDestination.GAMES
-    }
-}
 
 @Composable
 fun TopNavigationBar(
@@ -68,10 +59,26 @@ fun TopNavigationBar(
             .height(topNavHeight)
             .background(MaterialTheme.colorScheme.surface)
             .onShoulderButtonPress(
-                nextDestination = computeNextDestination(toTopNavDestination(currentDestination)),
-                previousDestination = computePreviousDestination(toTopNavDestination(currentDestination)),
-                onNext = { computeNextDestination(toTopNavDestination(currentDestination)) },
-                onPrevious = { computePreviousDestination(toTopNavDestination(currentDestination)) },
+                nextDestination = currentDestination
+                    .toTopNavDestination()
+                    .next(),
+                previousDestination = currentDestination
+                    .toTopNavDestination()
+                    .previous(),
+                onNext = {
+                    onTabSwitch(
+                        currentDestination
+                            .toTopNavDestination()
+                            .next()
+                    )
+                },
+                onPrevious = {
+                    onTabSwitch(
+                        currentDestination
+                            .toTopNavDestination()
+                            .previous()
+                    )
+                },
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

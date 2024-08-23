@@ -10,6 +10,7 @@
 
     <!-- Games -->
     <string name="games_title">Games</string>
+    <string name="games_achievement_title">Last achievement</string>
 
     <!-- Systems -->
     <string name="systems_title">Systems</string>
@@ -22,7 +23,7 @@
 
     <!-- Search -->
     <string name="search_title">Search</string>
-    <string name="search_hint">Search games, systems and settings...</string>
+    <string name="search_hint">Search games, systems and settings…</string>
 
     <!-- Profile -->
     <string name="profile_title">Profile</string>
