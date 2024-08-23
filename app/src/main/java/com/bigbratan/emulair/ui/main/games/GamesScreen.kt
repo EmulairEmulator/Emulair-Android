@@ -167,7 +167,7 @@ private fun GamesView(
 
         // TODO: IMPROVE FOCUS MANAGEMENT
         /*
-        - when any item is focused in general, a default decoration is applied to it, making its colors brighter
+        - when any UI element is focused in general, a default decoration is applied to it, making its colors brighter
         - applying `.focusable()` removes this default decoration
         - this carousel has `.focusable()` applied to it, so the default decoration of every item is removed
         - and for some reason, this also means items aren't actually into focus, they simply appear to be so (I don't really know what `.focusable()` actually does)
