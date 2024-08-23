@@ -184,7 +184,6 @@ private fun GamesView(
                 .focusRequester(focusRequester)
                 .focusable()
                 .onListScroll(
-                    coroutineScope = coroutineScope,
                     pagerState = pagerState,
                     itemCount = itemCount,
                     currentFocusedItem = currentFocusedItem,
