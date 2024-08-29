@@ -179,6 +179,8 @@ private fun GamesView(
 
         - I also need to put `.focusable()` on an item because I noticed otherwise the first element of the screen (the profile icon) comes into focus, for some reason
         - you can better notice this behaviour if you remove `.focusable()` from the Box inside SystemsScreen, OnlineScreen or SearchScreen
+
+        - also, for some reason, focusing the top app bar doesn't allow me to re-focus on any item on the screen again
         */
         Box(
             modifier = Modifier
