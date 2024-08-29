@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Default -->
     <string name="app_name">Emulair</string>
@@ -34,7 +34,6 @@
     <!-- Core Options -->
     <string name="core_options_title">Options</string>
 
-    <!--  -->
     <!--  -->
 
 </resources>

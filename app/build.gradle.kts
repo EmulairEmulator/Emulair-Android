@@ -18,7 +18,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        // buildConfigField("String", "GAME_COVERS_API_HOST", "\"https://internship.api.mocked.io/\"")
+        // buildConfigField("String", "GAME_COVERS_LIBRETRO_API_HOST", "\"https://thumbnails.libretro.com/\"")
 
         vectorDrawables {
             useSupportLibrary = true
