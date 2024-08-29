@@ -53,12 +53,14 @@ private fun SystemsView() {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .focusRequester(focusRequester),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start,
     ) {
-
+        Box(
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .focusable(),
+        )
     }
 }

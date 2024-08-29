@@ -9,6 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -21,6 +23,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.bigbratan.emulair.ui.components.TopNavDestination
 import com.bigbratan.emulair.ui.components.TopNavigationBar
 import com.bigbratan.emulair.ui.main.mainNavGraph
 
@@ -28,6 +31,7 @@ import com.bigbratan.emulair.ui.main.mainNavGraph
 @Composable
 fun Navigation(
     viewModel: NavigationViewModel = hiltViewModel(),
+    isGamePadConnected: MutableState<Boolean>,
 ) {
     val startDestinationState = viewModel.startDestinationFlow.collectAsState()
     val navController = rememberNavController()
@@ -35,15 +39,15 @@ fun Navigation(
 
     val topBarItems = remember {
         listOf(
-            Destination.Main.GamesDestination,
-            Destination.Main.SystemsDestination,
-            Destination.Main.OnlineDestination,
-            Destination.Main.SearchDestination,
+            TopNavDestination.SYSTEMS.route,
+            TopNavDestination.GAMES.route,
+            TopNavDestination.ONLINE.route,
+            TopNavDestination.SEARCH.route,
         )
     }
     val shouldShowTopBar = remember {
         derivedStateOf {
-            currentBackstackEntry?.destination?.route in topBarItems.map { it.route }
+            currentBackstackEntry?.destination?.route in topBarItems
         }
     }
 
@@ -61,14 +65,10 @@ fun Navigation(
             ) {
                 TopNavigationBar(
                     currentDestination = currentBackstackEntry?.destination,
+                    isGamePadConnected = isGamePadConnected.value,
                     onTabSwitch = { navDestination ->
                         navController.navigate(navDestination.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                            popUpTo(navDestination.route) { inclusive = true }
                         }
                     },
                     onProfileClick = {
@@ -106,12 +106,7 @@ fun Navigation(
                     },
                     navigateToTab = { navDestination ->
                         navController.navigate(navDestination.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                            popUpTo(navDestination.route) { inclusive = true }
                         }
                     },
                 )

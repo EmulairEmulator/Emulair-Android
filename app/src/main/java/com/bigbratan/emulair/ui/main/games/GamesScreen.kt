@@ -176,6 +176,9 @@ private fun GamesView(
         - however, this isn't good, because no other action is performed when the clicking occurs, only the focus is regained
         - the user has to click ONCE MORE in order to perform whatever action happens on `onGameClick()`
         - I need to learn proper focus management in Compose
+
+        - I also need to put `.focusable()` on an item because I noticed otherwise the first element of the screen (the profile icon) comes into focus, for some reason
+        - you can better notice this behaviour if you remove `.focusable()` from the Box inside SystemsScreen, OnlineScreen or SearchScreen
         */
         Box(
             modifier = Modifier
