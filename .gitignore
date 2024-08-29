@@ -1,6 +1,7 @@
 *.iml
 .gradle
 .idea
+.kotlin
 local.properties
 /local.properties
 build
@@ -9,3 +10,4 @@ build
 /captures
 .externalNativeBuild
 .cxx
+/.kotlin/
