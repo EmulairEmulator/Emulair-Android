@@ -17,6 +17,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.bigbratan.emulair.activities.LocalFocusProvider
 import com.bigbratan.emulair.ui.components.LocalTopNavHeight
 import com.bigbratan.emulair.ui.components.TopNavDestination
 import com.bigbratan.emulair.utils.next
@@ -27,10 +28,15 @@ import com.bigbratan.emulair.utils.previous
 fun SearchScreen(
     onTabSwitch: (TopNavDestination) -> Unit,
 ) {
+    val focusRequester = LocalFocusProvider.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .focusable()
             .padding(top = LocalTopNavHeight.current)
             .background(Color.Transparent)
             .onShoulderButtonPress(
@@ -40,27 +46,23 @@ fun SearchScreen(
                 onPrevious = { onTabSwitch(TopNavDestination.SEARCH.previous()) },
             ),
     ) {
-        SearchView()
+        SearchView(
+            focusRequester = focusRequester,
+        )
     }
 }
 
 @Composable
-private fun SearchView() {
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
+private fun SearchView(
+    focusRequester: FocusRequester,
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start,
     ) {
         Box(
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .focusable(),
+            modifier = Modifier.focusRequester(focusRequester),
         )
     }
 }

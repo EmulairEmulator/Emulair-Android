@@ -3,7 +3,6 @@ package com.bigbratan.emulair.ui.main.games
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,11 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -54,14 +52,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.bigbratan.emulair.R
+import com.bigbratan.emulair.activities.LocalFocusProvider
+import com.bigbratan.emulair.ui.components.FadingScrimBackground
 import com.bigbratan.emulair.ui.components.GamesListItem
 import com.bigbratan.emulair.ui.components.LocalTopNavHeight
+import com.bigbratan.emulair.ui.components.SolidScrimBackground
 import com.bigbratan.emulair.ui.components.TonalIconButton
 import com.bigbratan.emulair.ui.components.TopNavDestination
 import com.bigbratan.emulair.ui.theme.plusJakartaSans
@@ -84,11 +85,15 @@ fun GamesScreen(
 ) {
     val gamesState by viewModel.gamesFlow.collectAsState()
 
+    val focusRequester = LocalFocusProvider.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .focusable()
-            .padding(top = LocalTopNavHeight.current)
             .background(Color.Transparent)
             .onShoulderButtonPress(
                 nextDestination = TopNavDestination.GAMES.next(),
@@ -104,6 +109,7 @@ fun GamesScreen(
             onSuccess = { games ->
                 GamesView(
                     games = games,
+                    focusRequester = focusRequester,
                     onGameClick = onGameClick,
                     onAchievementsClick = onAchievementsClick,
                     onGameOptionsClick = onGameOptionsClick,
@@ -119,222 +125,289 @@ fun GamesScreen(
 @Composable
 private fun GamesView(
     games: List<GameItemViewModel>,
+    focusRequester: FocusRequester,
     onGameClick: (gameId: Int) -> Unit,
     onAchievementsClick: (gameId: Int) -> Unit,
     onGameOptionsClick: (gameId: Int) -> Unit,
 ) {
     val localConfiguration = LocalConfiguration.current
     val screenWidth by remember { mutableStateOf(localConfiguration.screenWidthDp.dp) }
-    val itemSpacing by remember { mutableStateOf(16.dp) }
     val itemCount by remember { mutableIntStateOf(games.size) }
     val itemWidth by remember { mutableStateOf(100.dp) }
+    val currentFocusedItem = remember { mutableIntStateOf(0) }
 
     val coroutineScope = rememberCoroutineScope()
-    val focusRequester = remember { FocusRequester() }
-    val currentFocusedItem = remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState(pageCount = { itemCount })
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 
     LaunchedEffect(pagerState.currentPage) {
         currentFocusedItem.intValue = pagerState.currentPage
     }
 
-    Column(
+    // TODO: IMPROVE FOCUS MANAGEMENT
+    /*
+    - I need to put `.focusable()` on an item because I noticed otherwise the first element of the screen (the profile icon) comes into focus, for some reason
+    - you can better notice this behaviour if you remove `.focusable()` from the Box inside SystemsScreen, OnlineScreen or SearchScreen
+    - also, for some reason, focusing the top app bar doesn't allow me to re-focus on any item on the screen again
+    */
+
+    // TODO: CREATE CUSTOM HOVER MANAGEMENT
+    // I just realized, hover management is what I need to do; all I wanted was to remove the ugly default hover decoration
+
+    Box(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start,
     ) {
-        Row(
+        GameBannerBackground(
+            imageBanner = games[currentFocusedItem.intValue].imageBanner,
+            imageBannerUri = games[currentFocusedItem.intValue].imageBannerUri,
+        )
+
+        Column(
             modifier = Modifier
-                .padding(top = 20.dp)
-                .padding(horizontal = 32.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
+                .fillMaxSize()
+                .padding(top = LocalTopNavHeight.current),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+        ) {
+            GameDetails(details = games[currentFocusedItem.intValue].details)
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onListScroll(
+                        pagerState = pagerState,
+                        itemCount = itemCount,
+                        currentFocusedItem = currentFocusedItem,
+                        onKeyEvent = {
+                            focusRequester.requestFocus()
+                        },
+                    ),
+            ) {
+                HorizontalPager(
+                    modifier = Modifier,
+                    state = pagerState,
+                    flingBehavior = PagerDefaults.flingBehavior(
+                        state = pagerState,
+                        pagerSnapDistance = PagerSnapDistance.atMost(itemCount),
+                    ),
+                    contentPadding = PaddingValues(
+                        start = 32.dp,
+                        end = screenWidth - itemWidth - 32.dp,
+                    ),
+                    pageSpacing = 16.dp,
+                    beyondViewportPageCount = 10,
+                ) { page ->
+                    val pageOffSet =
+                        ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+
+                    GamesListItem(
+                        icon = games[page].icon,
+                        iconUri = games[page].iconUri,
+                        title = games[page].placeholderTitle,
+                        fraction = 1f - pageOffSet.coerceIn(0f, 1f),
+                        onGameClick = {
+                            currentFocusedItem.intValue = page
+
+                            if (pagerState.currentPage == page) {
+                                onGameClick(games[page].id)
+                            } else {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(page)
+                                }
+                            }
+                        },
+                    )
+                }
+            }
+
+            GameActions(
+                screenWidth = screenWidth,
+                displayTitle = games[currentFocusedItem.intValue].displayTitle,
+                systemName = games[currentFocusedItem.intValue].systemName,
+                onAchievementsClick = { onAchievementsClick(games[pagerState.currentPage].id) },
+                onGameOptionsClick = { onGameOptionsClick(games[pagerState.currentPage].id) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun GameBannerBackground(
+    imageBanner: String?,
+    imageBannerUri: String?,
+) {
+    when {
+        imageBanner != null -> {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.60f),
+                model = imageBanner,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+
+            SolidScrimBackground()
+        }
+
+        imageBannerUri != null -> {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.60f),
+                model = imageBannerUri,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+
+            SolidScrimBackground()
+        }
+
+        else -> {
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.60f),
+                painter = painterResource(id = R.drawable.ill_deleteme),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+
+            FadingScrimBackground(
+                topColor = MaterialTheme.colorScheme.surface,
+                middleColor = Color.Black.copy(alpha = 0.40f),
+                bottomColor = MaterialTheme.colorScheme.surface,
+            )
+        }
+    }
+}
+
+@Composable
+private fun GameDetails(
+    details: String,
+) {
+    Row(
+        modifier = Modifier
+            .padding(top = 20.dp)
+            .padding(horizontal = 32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+    ) {
+        Text(
+            text = details,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontFamily = plusJakartaSans,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            style = TextStyle(platformStyle = removeFontPadding),
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+private fun GameActions(
+    screenWidth: Dp,
+    displayTitle: String,
+    systemName: String,
+    onAchievementsClick: () -> Unit,
+    onGameOptionsClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                horizontal = 32.dp,
+                vertical = 24.dp,
+            ),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.Start,
+    ) {
+        Column(
+            modifier = Modifier.width(screenWidth / 2.4f),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start,
         ) {
             Text(
-                text = games[currentFocusedItem.intValue].details,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.60f),
+                text = displayTitle,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontFamily = plusJakartaSans,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.SemiBold,
+                style = TextStyle(platformStyle = removeFontPadding),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = systemName,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontFamily = plusJakartaSans,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 style = TextStyle(platformStyle = removeFontPadding),
-                maxLines = 1,
             )
         }
 
-        // TODO: IMPROVE FOCUS MANAGEMENT
-        /*
-        - when any UI element is focused in general, a default decoration is applied to it, making its colors brighter
-        - applying `.focusable()` removes this default decoration
-        - this carousel has `.focusable()` applied to it, so the default decoration of every item is removed
-        - and for some reason, this also means items aren't actually into focus, they simply appear to be so (I don't really know what `.focusable()` actually does)
-        - I mean, I guess the default decoration appears only when the item is actually in focus, and because it doesn't appear on the items of the carousel, it means the items aren't actually in focus
-        - focus is regained once the user clicks an item (try pressing "Enter" on the Android Studio emulator when an item is selected)
-        - however, this isn't good, because no other action is performed when the clicking occurs, only the focus is regained
-        - the user has to click ONCE MORE in order to perform whatever action happens on `onGameClick()`
-        - I need to learn proper focus management in Compose
+        Spacer(modifier = Modifier.weight(1f))
 
-        - I also need to put `.focusable()` on an item because I noticed otherwise the first element of the screen (the profile icon) comes into focus, for some reason
-        - you can better notice this behaviour if you remove `.focusable()` from the Box inside SystemsScreen, OnlineScreen or SearchScreen
-
-        - also, for some reason, focusing the top app bar doesn't allow me to re-focus on any item on the screen again
-        */
-        Box(
+        Column(
             modifier = Modifier
-                .padding(top = 12.dp)
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .focusable()
-                .onListScroll(
-                    pagerState = pagerState,
-                    itemCount = itemCount,
-                    currentFocusedItem = currentFocusedItem,
-                    onKeyEvent = {
-                        focusRequester.requestFocus()
-                    },
+                .width(180.dp)
+                .height(120.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rememberRipple(),
+                    enabled = true,
+                    onClick = onAchievementsClick,
                 ),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            HorizontalPager(
-                modifier = Modifier,
-                state = pagerState,
-                flingBehavior = PagerDefaults.flingBehavior(
-                    state = pagerState,
-                    pagerSnapDistance = PagerSnapDistance.atMost(itemCount),
-                ),
-                contentPadding = PaddingValues(
-                    start = 32.dp,
-                    end = screenWidth - itemWidth - 32.dp,
-                ),
-                pageSpacing = itemSpacing,
-                beyondViewportPageCount = 10,
-            ) { page ->
-                val pageOffSet =
-                    ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+            Icon(
+                modifier = Modifier.size(64.dp),
+                imageVector = Icons.Filled.Image,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                contentDescription = null,
+            )
 
-                GamesListItem(
-                    modifier = Modifier.graphicsLayer {
-                        alpha = lerp(
-                            start = 0.40f,
-                            stop = 1f,
-                            fraction = 1f - pageOffSet.coerceIn(0f, 1f),
-                        )
-                    },
-                    icon = games[page].icon,
-                    iconUri = games[page].iconUri,
-                    title = games[page].placeholderTitle,
-                    onGameClick = {
-                        currentFocusedItem.intValue = page
-
-                        if (pagerState.currentPage == page) {
-                            onGameClick(games[page].id)
-                        } else {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(page)
-                            }
-                        }
-                    },
-                )
-            }
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(id = R.string.games_achievement_title),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontFamily = plusJakartaSans,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                style = TextStyle(platformStyle = removeFontPadding),
+            )
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    horizontal = 32.dp,
-                    vertical = 24.dp,
-                ),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            Column(
-                modifier = Modifier.width(screenWidth / 2.4f),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start,
-            ) {
-                Text(
-                    text = games[currentFocusedItem.intValue].displayTitle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontFamily = plusJakartaSans,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    style = TextStyle(platformStyle = removeFontPadding),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
+        Spacer(modifier = Modifier.width(16.dp))
 
-                Text(
-                    modifier = Modifier.padding(top = 12.dp),
-                    text = games[currentFocusedItem.intValue].systemName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.60f),
-                    fontFamily = plusJakartaSans,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    style = TextStyle(platformStyle = removeFontPadding),
-                )
-            }
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            TonalIconButton(
+                imageVector = Icons.Filled.FavoriteBorder,
+                size = 24.dp,
+                onClick = {
+                    // TODO: IMPLEMENT FAVORITE FUNCTIONALITY
+                }
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Column(
-                modifier = Modifier
-                    .width(180.dp)
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(),
-                        enabled = true,
-                        onClick = { onAchievementsClick(games[pagerState.currentPage].id) }
-                    ),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(
-                    modifier = Modifier.size(64.dp),
-                    imageVector = Icons.Filled.Image,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
-                    contentDescription = null,
-                )
-
-                Text(
-                    modifier = Modifier.padding(top = 12.dp),
-                    text = stringResource(id = R.string.games_achievement_title),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.60f),
-                    fontFamily = plusJakartaSans,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    style = TextStyle(platformStyle = removeFontPadding),
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                TonalIconButton(
-                    imageVector = Icons.Filled.FavoriteBorder,
-                    size = 24.dp,
-                    onClick = {
-                        // TODO: IMPLEMENT FAVORITE FUNCTIONALITY
-                    }
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                TonalIconButton(
-                    imageVector = Icons.Filled.Tune,
-                    size = 24.dp,
-                    onClick = { onGameOptionsClick(games[pagerState.currentPage].id) }
-                )
-            }
+            TonalIconButton(
+                imageVector = Icons.Filled.Tune,
+                size = 24.dp,
+                onClick = onGameOptionsClick,
+            )
         }
     }
 }

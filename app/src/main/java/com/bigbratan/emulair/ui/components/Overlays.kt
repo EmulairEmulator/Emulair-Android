@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -33,17 +34,25 @@ import com.bigbratan.emulair.ui.theme.plusJakartaSans
 @Composable
 internal fun FadingScrimBackground(
     topColor: Color = Color.Transparent,
+    middleColor: Color,
     bottomColor: Color,
-    shape: Shape,
-    aspectRatio: Float,
+    shape: Shape = RectangleShape,
+    aspectRatio: Float = 1f / 1f,
 ) {
     val gradient = Brush.verticalGradient(
-        colors = listOf(topColor, bottomColor)
+        colorStops = arrayOf(
+            0.0f to topColor,
+            0.3f to topColor,
+            0.5f to middleColor,
+            0.7f to bottomColor,
+            1.0f to bottomColor
+        )
     )
 
     Box(
         modifier = Modifier
             .clip(shape)
+            .fillMaxSize()
             .background(brush = gradient)
             .aspectRatio(aspectRatio)
     )
@@ -51,13 +60,14 @@ internal fun FadingScrimBackground(
 
 @Composable
 internal fun SolidScrimBackground(
-    shape: Shape,
-    aspectRatio: Float,
+    shape: Shape = RectangleShape,
+    aspectRatio: Float = 1f / 1f,
 ) {
     Box(
         modifier = Modifier
             .clip(shape)
-            .background(Color.Black.copy(alpha = 0.5f))
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.60f))
             .aspectRatio(aspectRatio)
     )
 }

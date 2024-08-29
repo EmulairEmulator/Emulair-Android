@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -39,8 +40,15 @@ fun GamesListItem(
     icon: String? = null,
     iconUri: String? = null,
     title: String,
+    fraction: Float,
     onGameClick: () -> Unit,
 ) {
+    val interpolatedColor = lerp(
+        MaterialTheme.colorScheme.surfaceVariant,
+        MaterialTheme.colorScheme.primaryContainer,
+        fraction
+    )
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -51,7 +59,7 @@ fun GamesListItem(
                 enabled = true,
                 onClick = onGameClick
             )
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(interpolatedColor)
             .aspectRatio(1f),
         contentAlignment = Alignment.Center,
     ) {
@@ -102,6 +110,7 @@ fun GamesListItemPreview() {
     ) {
         GamesListItem(
             title = "Game",
+            fraction = 1f,
             onGameClick = {},
         )
     }

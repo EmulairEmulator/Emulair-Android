@@ -8,17 +8,32 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.bigbratan.emulair.navigation.Navigation
+import com.bigbratan.emulair.ui.components.LocalTopNavHeight
+import com.bigbratan.emulair.ui.components.topNavHeight
 import com.bigbratan.emulair.ui.theme.EmulairTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+fun noLocalProvidedFor(name: String): Nothing {
+    error("CompositionLocal $name not present")
+}
+
+val LocalFocusProvider = staticCompositionLocalOf<FocusRequester> {
+    noLocalProvidedFor("FocusRequester")
+}
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val focusRequester = FocusRequester()
+
     private var isGamePadConnected = mutableStateOf(false)
 
     private val inputDeviceListener = object : InputManager.InputDeviceListener {
@@ -62,8 +77,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             EmulairTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Navigation(isGamePadConnected = isGamePadConnected)
+                CompositionLocalProvider(
+                    LocalFocusProvider provides focusRequester,
+                    LocalTopNavHeight provides topNavHeight,
+                ) {
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        Navigation(isGamePadConnected = isGamePadConnected)
+                    }
                 }
             }
         }

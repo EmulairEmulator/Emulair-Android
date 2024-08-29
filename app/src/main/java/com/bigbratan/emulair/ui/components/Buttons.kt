@@ -51,14 +51,14 @@ internal fun TonalIconButton(
                     color = MaterialTheme.colorScheme.primary,
                 ),
             )
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(size / 2),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             modifier = Modifier.size(size),
             imageVector = imageVector,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             contentDescription = null,
         )
     }
@@ -88,7 +88,7 @@ internal fun TransparentIconButton(
         Icon(
             modifier = Modifier.size(size),
             imageVector = imageVector,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             contentDescription = null,
         )
     }
@@ -115,7 +115,7 @@ internal fun OutlinedIconButton(
             .border(
                 BorderStroke(
                     width = size / 8,
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                 ),
                 shape = CircleShape
             )
@@ -125,7 +125,7 @@ internal fun OutlinedIconButton(
         Icon(
             modifier = Modifier.size(size),
             imageVector = imageVector,
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.60f),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             contentDescription = null,
         )
     }

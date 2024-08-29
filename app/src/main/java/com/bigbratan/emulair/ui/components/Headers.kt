@@ -64,7 +64,6 @@ fun TopNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(topNavHeight)
-            .background(MaterialTheme.colorScheme.surface)
             .onShoulderButtonPress(
                 nextDestination = currentDestination
                     .toTopNavDestination()
@@ -126,9 +125,9 @@ fun TopNavigationBar(
                             Color.Transparent
                         },
                         contentColor = if (currentDestination?.route == navDestination.route) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
                         },
                     ),
                 ) {

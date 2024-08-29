@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -57,29 +59,6 @@ fun Navigation(
                 .fillMaxSize()
                 .background(Color.Transparent),
         ) {
-            AnimatedVisibility(
-                modifier = Modifier.align(Alignment.TopCenter),
-                visible = shouldShowTopBar.value,
-                enter = fadeIn(animationSpec = tween(400)),
-                exit = fadeOut(animationSpec = tween(400))
-            ) {
-                TopNavigationBar(
-                    currentDestination = currentBackstackEntry?.destination,
-                    isGamePadConnected = isGamePadConnected.value,
-                    onTabSwitch = { navDestination ->
-                        navController.navigate(navDestination.route) {
-                            popUpTo(navDestination.route) { inclusive = true }
-                        }
-                    },
-                    onProfileClick = {
-                        navController.navigate(Destination.Main.ProfileDestination.route)
-                    },
-                    onSettingsClick = {
-                        navController.navigate(Destination.Main.SettingsDestination.route)
-                    },
-                )
-            }
-
             NavHost(
                 navController = navController,
                 startDestination = startDestination,
@@ -108,6 +87,29 @@ fun Navigation(
                         navController.navigate(navDestination.route) {
                             popUpTo(navDestination.route) { inclusive = true }
                         }
+                    },
+                )
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.TopCenter),
+                visible = shouldShowTopBar.value,
+                enter = fadeIn(animationSpec = tween(400)),
+                exit = fadeOut(animationSpec = tween(400))
+            ) {
+                TopNavigationBar(
+                    currentDestination = currentBackstackEntry?.destination,
+                    isGamePadConnected = isGamePadConnected.value,
+                    onTabSwitch = { navDestination ->
+                        navController.navigate(navDestination.route) {
+                            popUpTo(navDestination.route) { inclusive = true }
+                        }
+                    },
+                    onProfileClick = {
+                        navController.navigate(Destination.Main.ProfileDestination.route)
+                    },
+                    onSettingsClick = {
+                        navController.navigate(Destination.Main.SettingsDestination.route)
                     },
                 )
             }
